@@ -1,0 +1,6 @@
+services:
+  merengonsitos:
+    image: merengonsitos
+    build:
+      context: .
+      dockerfile: ./Dockerfile
