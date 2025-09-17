@@ -22,8 +22,4 @@ public class Activity {
     @JoinColumn(name = "process_id", nullable = false)
     private Process process;
 
-        @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "rol_id", nullable = false,
-                foreignKey = @ForeignKey(name = "fk_activity_rol"))
-    private Rol rol;
 }

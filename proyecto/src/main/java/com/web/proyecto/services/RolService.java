@@ -3,8 +3,8 @@ package com.web.proyecto.services;
 import com.web.proyecto.dtos.RolDTO;
 import com.web.proyecto.entities.Empresa;
 import com.web.proyecto.entities.Rol;
-import com.web.proyecto.repositories.ActivityRepository;
 import com.web.proyecto.repositories.EmpresaRepository;
+import com.web.proyecto.repositories.ProcessRepository;
 import com.web.proyecto.repositories.RolRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +20,9 @@ public class RolService {
 
     private final RolRepository rolRepository;
     private final EmpresaRepository empresaRepository;
-    private final ActivityRepository activityRepository; // para HU-19/20
+    private final ProcessRepository processRepository; // 🔹 ahora contamos procesos
 
-    /* ========= Mappers ========= */
-
+    /* ====== Mappers ====== */
     private RolDTO toDTO(Rol r, Long usageCount) {
         return RolDTO.builder()
                 .id(r.getId())
@@ -43,8 +42,7 @@ public class RolService {
                 .build();
     }
 
-    /* ========= CRUD ========= */
-
+    /* ====== CRUD ====== */
     public RolDTO create(Long empresaId, @Valid RolDTO dto) {
         Empresa empresa = empresaRepository.findById(empresaId)
                 .orElseThrow(() -> new IllegalArgumentException("Empresa no encontrada: " + empresaId));
@@ -54,21 +52,21 @@ public class RolService {
         }
 
         Rol saved = rolRepository.save(toEntity(dto, empresa));
-        long usage = 0L; // recién creado
-        return toDTO(saved, usage);
+        return toDTO(saved, 0L);
     }
 
     @Transactional(readOnly = true)
     public List<RolDTO> list(Long empresaId) {
-        // HU-20: devolver usageCount por rol
-        return rolRepository.findByEmpresa_Id(empresaId).stream().map(r -> toDTO(r, activityRepository.countByRol_Id(r.getId()))).toList();
+        return rolRepository.findByEmpresa_Id(empresaId).stream()
+                .map(r -> toDTO(r, processRepository.countByRol_Id(r.getId())))
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public RolDTO getById(Long empresaId, Long id) {
         Rol rol = rolRepository.findByIdAndEmpresa_Id(id, empresaId)
                 .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + id));
-        long usage = activityRepository.countByRol_Id(id);
+        long usage = processRepository.countByRol_Id(id);
         return toDTO(rol, usage);
     }
 
@@ -83,7 +81,7 @@ public class RolService {
         rol.setNombre(dto.getNombre());
         rol.setDescripcion(dto.getDescripcion());
         Rol saved = rolRepository.save(rol);
-        long usage = activityRepository.countByRol_Id(saved.getId());
+        long usage = processRepository.countByRol_Id(saved.getId());
         return toDTO(saved, usage);
     }
 
@@ -91,11 +89,9 @@ public class RolService {
         Rol rol = rolRepository.findByIdAndEmpresa_Id(id, empresaId)
                 .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + id));
 
-        long usage = activityRepository.countByRol_Id(id);
+        long usage = processRepository.countByRol_Id(id);
         if (usage > 0) {
-            throw new IllegalArgumentException(
-                "No se puede eliminar el rol: está asignado a " + usage + " actividad(es)"
-            );
+            throw new IllegalArgumentException("No se puede eliminar el rol: está asignado a " + usage + " proceso(s)");
         }
 
         rolRepository.deleteById(id);

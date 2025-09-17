@@ -2,7 +2,9 @@ package com.web.proyecto.services;
 
 import com.web.proyecto.dtos.ProcessDTO;
 import com.web.proyecto.entities.Process;
+import com.web.proyecto.entities.Rol;
 import com.web.proyecto.repositories.ProcessRepository;
+import com.web.proyecto.repositories.RolRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,14 +15,17 @@ import java.util.List;
 public class ProcessService {
 
     private final ProcessRepository processRepository;
+    private final RolRepository rolRepository; // <-- NUEVO
 
-    public ProcessService(ProcessRepository processRepository) {
+    public ProcessService(ProcessRepository processRepository, RolRepository rolRepository) {
         this.processRepository = processRepository;
+        this.rolRepository = rolRepository; // <-- NUEVO
     }
 
     public Process create(String name) {
         Process p = new Process();
         p.setName(name);
+        // OJO: si Process.rol es NOT NULL, este método necesitará asignar un rol por defecto
         return processRepository.save(p);
     }
 
@@ -63,6 +68,7 @@ public class ProcessService {
             dto.setCategory(p.getCategory());
             dto.setStatus(p.getStatus());
             dto.setEmpresaId(p.getEmpresaId());
+            dto.setRolId(p.getRol() != null ? p.getRol().getId() : null); // <-- NUEVO
             return dto;
         }).toList();
     }
@@ -73,11 +79,22 @@ public class ProcessService {
             throw new IllegalArgumentException("No processes found for empresaId: " + empresaId);
         }
 
+        // Si viene rolId, resolver y validar que pertenezca a la misma empresa
+        Rol rolResolved = null;
+        if (dto.getRolId() != null) {
+            rolResolved = rolRepository.findById(dto.getRolId())
+                    .orElseThrow(() -> new IllegalArgumentException("Role not found: " + dto.getRolId()));
+            if (!rolResolved.getEmpresa().getId().equals(empresaId)) {
+                throw new IllegalArgumentException("Role does not belong to the same empresa");
+            }
+        }
+
         for (Process p : procesos) {
             if (dto.getName() != null)        p.setName(dto.getName());
             if (dto.getDescription() != null) p.setDescription(dto.getDescription());
             if (dto.getCategory() != null)    p.setCategory(dto.getCategory());
             if (dto.getStatus() != null)      p.setStatus(dto.getStatus());
+            if (rolResolved != null)          p.setRol(rolResolved); // <-- NUEVO (update masivo de rol)
         }
 
         List<Process> saved = processRepository.saveAll(procesos);
@@ -90,6 +107,7 @@ public class ProcessService {
             out.setCategory(p.getCategory());
             out.setStatus(p.getStatus());
             out.setEmpresaId(p.getEmpresaId());
+            out.setRolId(p.getRol() != null ? p.getRol().getId() : null); // <-- NUEVO
             return out;
         }).toList();
     }
@@ -101,6 +119,16 @@ public class ProcessService {
         if (dto.getName() == null || dto.getName().isBlank()) {
             throw new IllegalArgumentException("name is required");
         }
+        if (dto.getRolId() == null) {
+            throw new IllegalArgumentException("rolId is required"); // <-- NUEVO
+        }
+
+        // Resolver rol y validar que pertenezca a la misma empresa
+        Rol rol = rolRepository.findById(dto.getRolId())
+                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + dto.getRolId()));
+        if (!rol.getEmpresa().getId().equals(dto.getEmpresaId())) {
+            throw new IllegalArgumentException("Role does not belong to the same empresa");
+        }
 
         Process entity = new Process();
         entity.setId(null);
@@ -109,6 +137,7 @@ public class ProcessService {
         entity.setCategory(dto.getCategory());
         entity.setStatus((dto.getStatus() == null || dto.getStatus().isBlank()) ? "DRAFT" : dto.getStatus());
         entity.setEmpresaId(dto.getEmpresaId());
+        entity.setRol(rol); // <-- NUEVO
 
         Process saved = processRepository.save(entity);
 
@@ -119,6 +148,7 @@ public class ProcessService {
         res.setCategory(saved.getCategory());
         res.setStatus(saved.getStatus());
         res.setEmpresaId(saved.getEmpresaId());
+        res.setRolId(saved.getRol() != null ? saved.getRol().getId() : null); // <-- NUEVO
         return res;
     }
 }

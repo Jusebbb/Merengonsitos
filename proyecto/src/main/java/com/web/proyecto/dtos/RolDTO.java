@@ -16,9 +16,7 @@ public class RolDTO {
     @Size(max = 255, message = "La descripción no puede exceder 255 caracteres")
     private String descripcion;
 
-    // empresa a la que pertenece el rol (HU-17)
     private Long empresaId;
 
-    // Campo de solo lectura: cuántas actividades usan este rol (HU-20)
     private Long usageCount;
 }
