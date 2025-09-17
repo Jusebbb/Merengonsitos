@@ -22,8 +22,7 @@ public class RolController {
 
     // HU-17: crear rol en una empresa
     @PostMapping
-    public ResponseEntity<RolDTO> create(@PathVariable Long empresaId,
-                                         @RequestBody @Valid RolDTO dto) {
+    public ResponseEntity<RolDTO> create(@PathVariable Long empresaId, @RequestBody @Valid RolDTO dto) {
         RolDTO created = rolService.create(empresaId, dto);
         return ResponseEntity.created(URI.create(
                 "/api/empresas/" + empresaId + "/roles/" + created.getId()))
@@ -37,8 +36,7 @@ public class RolController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RolDTO> getById(@PathVariable Long empresaId,
-                                          @PathVariable Long id) {
+    public ResponseEntity<RolDTO> getById(@PathVariable Long empresaId, @PathVariable Long id) {
         return ResponseEntity.ok(rolService.getById(empresaId, id));
     }
 
