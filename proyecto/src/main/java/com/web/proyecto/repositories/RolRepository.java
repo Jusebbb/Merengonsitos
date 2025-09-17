@@ -15,4 +15,5 @@ public interface RolRepository extends JpaRepository<Rol, Long> {
     List<Rol> findByEmpresa_Id(Long empresaId);
 
     Optional<Rol> findByIdAndEmpresa_Id(Long id, Long empresaId);
+    Optional<Rol> findByNombreIgnoreCaseAndEmpresa_Id(String nombre, Long empresaId);
 }

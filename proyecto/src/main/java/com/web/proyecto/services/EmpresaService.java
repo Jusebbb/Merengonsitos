@@ -2,6 +2,7 @@ package com.web.proyecto.services;
 
 import com.web.proyecto.dtos.EmpresaDTO;
 import com.web.proyecto.entities.Empresa;
+import com.web.proyecto.entities.Rol;
 import com.web.proyecto.entities.Usuario;
 import com.web.proyecto.repositories.EmpresaRepository;
 import com.web.proyecto.repositories.UsuarioRepository;
@@ -48,16 +49,31 @@ public class EmpresaService {
     }
 
     public EmpresaDTO create(EmpresaDTO dto) {
-    if (repo.existsByNit(dto.getNit())) {
-        throw new IllegalArgumentException("Ya existe una empresa con NIT: " + dto.getNit());
-    }
-    if (repo.existsByCorreoContacto(dto.getCorreoContacto())) {
-        throw new IllegalArgumentException("Ya existe una empresa con ese correo de contacto: " + dto.getCorreoContacto());
+        if (repo.existsByNit(dto.getNit())) {
+            throw new IllegalArgumentException("Ya existe una empresa con NIT: " + dto.getNit());
+        }
+        if (repo.existsByCorreoContacto(dto.getCorreoContacto())) {
+            throw new IllegalArgumentException("Ya existe una empresa con ese correo de contacto: " + dto.getCorreoContacto());
+        }
+
+        Empresa e = repo.save(toEntity(dto));
+
+        if (usuarioRepository.existsByEmail(dto.getCorreoContacto())) {
+            throw new IllegalArgumentException("El correo del admin ya está en uso: " + dto.getCorreoContacto());
+        }
+
+        Usuario admin = new Usuario();
+        admin.setNombre("Administrador " + dto.getNombre());  // ✅ campo obligatorio
+        admin.setEmail(dto.getCorreoContacto());
+        admin.setPassword(passwordEncoder.encode("ChangeMe123!"));
+        admin.setRol("ADMIN");   // como String
+        admin.setEmpresa(e);
+
+        usuarioRepository.save(admin);
+
+        return toDTO(e);
     }
 
-    Empresa e = repo.save(toEntity(dto));
-    return toDTO(e);
-    }
 
 
     public EmpresaDTO update(Long id, EmpresaDTO dto) {
