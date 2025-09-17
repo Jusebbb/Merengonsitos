@@ -20,5 +20,10 @@ public class Activity {
     // Relación con Process (tu entidad ya existe)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "process_id", nullable = false)
-    private com.web.proyecto.entities.Process process;
+    private Process process;
+
+        @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "rol_id", nullable = false,
+                foreignKey = @ForeignKey(name = "fk_activity_rol"))
+    private Rol rol;
 }

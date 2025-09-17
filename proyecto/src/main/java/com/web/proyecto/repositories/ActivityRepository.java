@@ -18,4 +18,6 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
     // combinado
     List<Activity> findByProcess_EmpresaIdAndProcess_Status(Long empresaId, String status);
+
+    long countByRol_Id(Long rolId);
 }

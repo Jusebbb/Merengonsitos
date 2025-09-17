@@ -48,34 +48,17 @@ public class EmpresaService {
     }
 
     public EmpresaDTO create(EmpresaDTO dto) {
-        if (repo.existsByNit(dto.getNit())) {
-            throw new IllegalArgumentException("Ya existe una empresa con NIT: " + dto.getNit());
-        }
-        if (repo.existsByCorreoContacto(dto.getCorreoContacto())) {
-            throw new IllegalArgumentException(
-                "Ya existe una empresa con ese correo de contacto: " + dto.getCorreoContacto());
-        }
-
-        Empresa e = repo.save(toEntity(dto));
-
-        if (usuarioRepository.existsByEmail(dto.getCorreoContacto())) {
-        throw new IllegalArgumentException("El correo del admin ya está en uso: " + dto.getCorreoContacto());
-        }
-
-        try {
-            Usuario admin = new Usuario();
-            admin.setEmail(dto.getCorreoContacto());
-            admin.setPassword(passwordEncoder.encode("ChangeMe123!"));
-            admin.setRol("ADMIN");
-            admin.setEmpresa(e);
-            usuarioRepository.save(admin);
-        } catch (DataIntegrityViolationException ex) {
-            // Por si algún constraint de DB se dispara igual
-            throw new IllegalArgumentException("No se pudo crear el admin inicial (datos duplicados o inválidos)");
-        }
-
-        return toDTO(e);
+    if (repo.existsByNit(dto.getNit())) {
+        throw new IllegalArgumentException("Ya existe una empresa con NIT: " + dto.getNit());
     }
+    if (repo.existsByCorreoContacto(dto.getCorreoContacto())) {
+        throw new IllegalArgumentException("Ya existe una empresa con ese correo de contacto: " + dto.getCorreoContacto());
+    }
+
+    Empresa e = repo.save(toEntity(dto));
+    return toDTO(e);
+    }
+
 
     public EmpresaDTO update(Long id, EmpresaDTO dto) {
         Empresa e = repo.findById(id)
