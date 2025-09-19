@@ -1,63 +1,123 @@
+# --------------------------------------------------------
+# Manifiesto Kubernetes completo (Namespace, ConfigMap, Secret,
+# Deployment, Service, Ingress) para una app Spring Boot en 8080
+# Reemplaza:
+#  - image: TU_IMAGEN:TAG
+#  - host: TU_DOMINIO (o deja vacío)
+#  - db credentials en secret si las usas
+# --------------------------------------------------------
+
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: NAMESPACE   # <- Reemplaza con el namespace que quieras usar
+  name: merengonsitos
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: merengonsitos-config
+  namespace: merengonsitos
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  # agrega aquí más variables no sensibles si las necesitas
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: merengonsitos-secrets
+  namespace: merengonsitos
+type: Opaque
+stringData:
+  # ejemplo (no usar valores reales aquí; reemplaza antes de aplicar)
+  DB_USER: "tu_usuario"
+  DB_PASSWORD: "tu_password"
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: APP_NAME
-  namespace: NAMESPACE
+  name: merengonsitos-deployment
+  namespace: merengonsitos
+  labels:
+    app: merengonsitos
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: APP_NAME
+      app: merengonsitos
   template:
     metadata:
       labels:
-        app: APP_NAME
+        app: merengonsitos
     spec:
       containers:
-        - name: APP_NAME
-          image: NOMBRE_IMAGEN   # <- IMAGEN PUBLICADA EN GHCR
+        - name: merengonsitos
+          image: TU_IMAGEN:TAG                # <- REEMPLAZA por tu imagen (ej. jusebbb/merengonsitos:latest)
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 80
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: merengonsitos-config
+            - secretRef:
+                name: merengonsitos-secrets
+          readinessProbe:
+            httpGet:
+              path: /actuator/health   # ajusta a '/' si no usas actuator
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: APP_NAME
-  namespace: NAMESPACE
+  name: merengonsitos-service
+  namespace: merengonsitos
 spec:
   selector:
-    app: APP_NAME
+    app: merengonsitos
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 8080
   type: ClusterIP
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: APP_NAME
-  namespace: NAMESPACE
+  name: merengonsitos-ingress
+  namespace: merengonsitos
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: public   # <- en MicroK8s normalmente es "public" (verifica con `kubectl get ingressclass`)
+  ingressClassName: public   # cambia a 'nginx' o la que corresponda en tu cluster
   rules:
-    - host: 
+    - host: TU_DOMINIO        # <- reemplaza por tu dominio o deja vacío si pruebas local
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: APP_NAME
+                name: merengonsitos-service
                 port:
                   number: 80
