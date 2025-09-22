@@ -1,15 +1,16 @@
 package com.web.proyecto.dtos;
 
+import com.web.proyecto.entities.ProcessStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProcessDTO {
-
     private Long id;
 
     @NotBlank
@@ -19,7 +20,8 @@ public class ProcessDTO {
 
     private String category;
 
-    private String status;
+    private ProcessStatus status;
 
+    @NotNull
     private Long empresaId;
 }
