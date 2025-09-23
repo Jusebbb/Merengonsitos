@@ -17,7 +17,6 @@ public class Activity {
     @Column(nullable = false)
     private String name;
 
-    // Relación con Process (tu entidad ya existe)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "process_id", nullable = false)
     private com.web.proyecto.entities.Process process;

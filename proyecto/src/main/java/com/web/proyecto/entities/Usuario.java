@@ -22,6 +22,8 @@ public class Usuario {
 
     @Column(nullable = false, length = 120)
     private String password;
+    @Column(nullable = false)
+    private String rol;
 
     // Relación con Empresa
     @ManyToOne

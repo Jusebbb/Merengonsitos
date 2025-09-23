@@ -6,7 +6,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "empresa", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_empresa_nit", columnNames = "nit")
+        @UniqueConstraint(name = "empresa_nit", columnNames = "nit")
 })
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class Empresa {
@@ -18,15 +18,16 @@ public class Empresa {
     @Column(nullable = false, length = 120)
     private String nombre;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, unique = true, length = 30)
     private String nit;
 
     @Column(nullable = false, length = 120)
     private String correoContacto;
+    
+    @Column(nullable = false)
+    private boolean active = true;
 
     // Relación con usuarios
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Usuario> usuarios;
 }
-
-
