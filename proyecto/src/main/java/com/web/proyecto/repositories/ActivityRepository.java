@@ -21,5 +21,5 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> findByProcess_EmpresaIdAndProcess_Status(Long empresaId, String status);
 
     // NUEVO: listar todas menos las eliminadas
-    List<Activity> findByStatusNot(Status status);
+    List<Activity> findByStatusNot(String status);
 }

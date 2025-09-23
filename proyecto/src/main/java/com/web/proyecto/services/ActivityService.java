@@ -4,7 +4,6 @@ import com.web.proyecto.dtos.ActivityDTO;
 import com.web.proyecto.entities.Activity;
 import com.web.proyecto.entities.ActivityHistory;
 import com.web.proyecto.entities.Process;
-import com.web.proyecto.entities.Status;
 import com.web.proyecto.repositories.ActivityHistoryRepository;
 import com.web.proyecto.repositories.ActivityRepository;
 import com.web.proyecto.repositories.ProcessRepository;
@@ -44,40 +43,41 @@ public class ActivityService {
                 .type(dto.getType())
                 .description(dto.getDescription())
                 .roleId(dto.getRoleId())
-                .status(dto.getStatus() == null ? Status.ACTIVE : dto.getStatus())
+                .status(dto.getStatus() == null ? "ACTIVE" : dto.getStatus())
                 .process(p)
                 .build();
     }
 
-    /* =================== HU-08: CREATE =================== */
+    /* =================== CREATE =================== */
 
     public ActivityDTO create(ActivityDTO dto) {
-        Process p = processRepository.findById(dto.getProcessId())
-                .orElseThrow(() -> new IllegalArgumentException("Process no existe: " + dto.getProcessId()));
+        if (dto.getName() == null || dto.getName().isBlank())
+            throw new IllegalArgumentException("El campo 'name' es obligatorio");
+        if (dto.getProcessId() == null)
+            throw new IllegalArgumentException("El campo 'processId' es obligatorio");
 
-        if (activityRepository.existsByNameIgnoreCaseAndProcess_Id(dto.getName(), dto.getProcessId())) {
-            throw new IllegalArgumentException("Ya existe una actividad con ese nombre en el proceso");
-        }
+        Process process = processRepository.findById(dto.getProcessId())
+                .orElseThrow(() -> new IllegalArgumentException("Proceso no encontrado con id=" + dto.getProcessId()));
 
-        Activity saved = activityRepository.save(fromDTOForCreate(dto, p));
+        Activity activity = fromDTOForCreate(dto, process);
+        Activity saved = activityRepository.save(activity);
+
         return toDTO(saved);
     }
 
-    /* =================== HU-09: UPDATE + HISTORIAL =================== */
+    /* =================== UPDATE + HISTORIAL =================== */
 
     public ActivityDTO update(Long id, ActivityDTO dto) {
         Activity a = activityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Activity no existe: " + id));
 
-        // track de cambios
         trackChange(id, "name", a.getName(), dto.getName());
         trackChange(id, "type", a.getType(), dto.getType());
         trackChange(id, "description", a.getDescription(), dto.getDescription());
         trackChange(id, "roleId", s(a.getRoleId()), s(dto.getRoleId()));
-        trackChange(id, "status", e(a.getStatus()), e(dto.getStatus()));
+        trackChange(id, "status", n(a.getStatus()), n(dto.getStatus()));
         trackChange(id, "processId", s(a.getProcess().getId()), s(dto.getProcessId()));
 
-        // aplicar cambios
         if (dto.getName() != null) a.setName(dto.getName());
         if (dto.getType() != null) a.setType(dto.getType());
         if (dto.getDescription() != null) a.setDescription(dto.getDescription());
@@ -93,40 +93,38 @@ public class ActivityService {
         return toDTO(activityRepository.save(a));
     }
 
-    /* =================== HU-10: INACTIVAR / SOFT DELETE =================== */
+    /* =================== SOFT DELETE =================== */
 
     public void inactivate(Long id) {
         Activity a = activityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Activity no existe: " + id));
 
-        if (a.getStatus() != Status.INACTIVE) {
-            trackChange(id, "status", e(a.getStatus()), Status.INACTIVE.name());
-            a.setStatus(Status.INACTIVE);
+        if (!"INACTIVE".equalsIgnoreCase(a.getStatus())) {
+            trackChange(id, "status", n(a.getStatus()), "INACTIVE");
+            a.setStatus("INACTIVE");
             activityRepository.save(a);
         }
-        // Aquí puedes ajustar reglas de "flujo" si tu dominio lo requiere.
     }
 
     public void softDelete(Long id) {
         Activity a = activityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Activity no existe: " + id));
 
-        if (a.getStatus() != Status.DELETED) {
-            trackChange(id, "status", e(a.getStatus()), Status.DELETED.name());
-            a.setStatus(Status.DELETED);
+        if (!"DELETED".equalsIgnoreCase(a.getStatus())) {
+            trackChange(id, "status", n(a.getStatus()), "DELETED");
+            a.setStatus("DELETED");
             activityRepository.save(a);
         }
     }
 
-    /* =================== LISTAS ÚTILES =================== */
+    /* =================== QUERIES =================== */
 
     @Transactional(readOnly = true)
     public List<ActivityDTO> listActiveOrInactive() {
-        return activityRepository.findByStatusNot(Status.DELETED)
+        return activityRepository.findByStatusNot("DELETED")
                 .stream().map(this::toDTO).toList();
     }
 
-    // Wrappers habituales por si ya los usaban en el proyecto:
     @Transactional(readOnly = true)
     public List<ActivityDTO> listByProcessId(Long processId) {
         return activityRepository.findByProcess_Id(processId).stream().map(this::toDTO).toList();
@@ -153,7 +151,7 @@ public class ActivityService {
                 .stream().map(this::toDTO).toList();
     }
 
-    /* =================== HELPERS HISTORIAL =================== */
+    /* =================== HELPERS =================== */
 
     private void trackChange(Long activityId, String field, String oldV, String newV) {
         if (!Objects.equals(n(oldV), n(newV))) {
@@ -168,5 +166,4 @@ public class ActivityService {
 
     private String n(String v) { return v == null ? "" : v; }
     private String s(Object v) { return v == null ? null : String.valueOf(v); }
-    private String e(Enum<?> en) { return en == null ? null : en.name(); }
 }

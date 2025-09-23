@@ -27,10 +27,8 @@ public class Activity {
 
     private Long roleId;
 
-    // Estado como ENUM guardado en texto
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Status status = Status.ACTIVE;
+    @Column(nullable = false, length = 20)
+    private String status = "ACTIVE";
 
     // Relación ya existente con Process
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
