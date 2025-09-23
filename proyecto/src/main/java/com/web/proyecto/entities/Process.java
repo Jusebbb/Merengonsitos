@@ -1,9 +1,11 @@
 package com.web.proyecto.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "process")
@@ -12,8 +14,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class Process {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 45)
@@ -25,9 +26,8 @@ public class Process {
     @Column(length = 45)
     private String category;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private ProcessStatus status;
+    private String status = "ACTIVE";
 
     @Column(name = "empresa_id", nullable = false)
     private Long empresaId;
@@ -35,4 +35,11 @@ public class Process {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "rol_id", nullable = false, foreignKey = @ForeignKey(name = "fk_process_rol"))
     private Rol rol;
+
+    // ===== Auditoría ligera (HU-05 simplificado) =====
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "updated_by", length = 100)
+    private String updatedBy;
 }

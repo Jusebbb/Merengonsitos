@@ -1,30 +1,32 @@
 package com.web.proyecto.dtos;
 
-import com.web.proyecto.entities.ProcessStatus;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+/** DTO para crear/editar procesos */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProcessDTO {
+
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "El nombre del proceso es obligatorio")
     private String name;
 
     private String description;
 
     private String category;
 
-    private ProcessStatus status;
+    /** "ACTIVE" | "INACTIVE" | "DRAFT" (el Service lo mapea al enum) */
+    private String status;
 
-    @NotNull
+    @NotNull(message = "El id de la empresa es obligatorio")
     private Long empresaId;
 
-    @NotNull
+    @NotNull(message = "El id del rol es obligatorio")
     private Long rolId;
 }
