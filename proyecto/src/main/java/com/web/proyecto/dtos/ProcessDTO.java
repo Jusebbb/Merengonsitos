@@ -1,5 +1,7 @@
 package com.web.proyecto.dtos;
 
+import java.time.LocalDateTime;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -29,4 +31,7 @@ public class ProcessDTO {
 
     @NotNull(message = "El id del rol es obligatorio")
     private Long rolId;
+
+    private LocalDateTime updatedAt;
+    private String updatedBy; 
 }

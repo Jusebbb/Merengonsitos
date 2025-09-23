@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Entity
 @Table(name = "process")
 @Data
@@ -51,8 +53,10 @@ public class Process {
     private List<Gateway> gateways = new ArrayList<>();
 
     @Column(name = "updated_at")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    // 🔹 Este sí debes setearlo en el Service con el usuario que edita
     @Column(name = "updated_by", length = 100)
     private String updatedBy;
 }

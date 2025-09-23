@@ -154,6 +154,8 @@ public List<ProcessDTO> listDto() {
         dto.setStatus(e.getStatus());
         dto.setEmpresaId(e.getEmpresaId());
         dto.setRolId(rolId);
+        dto.setUpdatedAt(e.getUpdatedAt());
+        dto.setUpdatedBy(e.getUpdatedBy());
         return dto;
     }
 
