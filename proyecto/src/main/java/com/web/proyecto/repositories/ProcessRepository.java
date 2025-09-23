@@ -10,4 +10,5 @@ public interface ProcessRepository extends JpaRepository<Process, Long> {
     List<Process> findByStatus(ProcessStatus status);
     List<Process> findByCategory(String category);
     List<Process> findByEmpresaIdAndStatus(Long empresaId, ProcessStatus status);
+    long countByRol_Id(Long rolId);
 }
