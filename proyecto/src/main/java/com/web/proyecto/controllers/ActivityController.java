@@ -4,7 +4,6 @@ import com.web.proyecto.dtos.ActivityDTO;
 import com.web.proyecto.services.ActivityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,63 +16,62 @@ public class ActivityController {
 
     private final ActivityService activityService;
 
-    /* -------- CRUD -------- */
-
+    // ===== HU-08: crear =====
     @PostMapping
-    public ResponseEntity<ActivityDTO> create(@Valid @RequestBody ActivityDTO dto){
-        return new ResponseEntity<>(activityService.create(dto), HttpStatus.CREATED);
+    public ResponseEntity<ActivityDTO> create(@Valid @RequestBody ActivityDTO dto) {
+        return ResponseEntity.ok(activityService.create(dto));
     }
 
-    @GetMapping
-    public ResponseEntity<List<ActivityDTO>> listAll(){
-        return ResponseEntity.ok(activityService.listAll());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ActivityDTO> getById(@PathVariable Long id){
-        return ResponseEntity.ok(activityService.getById(id));
-    }
-
+    // ===== HU-09: editar (con historial) =====
     @PutMapping("/{id}")
-    public ResponseEntity<ActivityDTO> update(@PathVariable Long id, @Valid @RequestBody ActivityDTO dto){
+    public ResponseEntity<ActivityDTO> update(@PathVariable Long id,
+                                              @RequestBody ActivityDTO dto) {
         return ResponseEntity.ok(activityService.update(id, dto));
     }
 
+    // ===== HU-10: inactivar =====
+    @PatchMapping("/{id}/inactivate")
+    public ResponseEntity<Void> inactivate(@PathVariable Long id) {
+        activityService.inactivate(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ===== HU-10: eliminar lógico =====
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id){
-        activityService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        activityService.softDelete(id);
+        return ResponseEntity.noContent().build();
     }
 
-    /* -------- Filtros paralelos a Process -------- */
-
-    // Por id de proceso
-    @GetMapping("/process/{processId}")
-    public ResponseEntity<List<ActivityDTO>> listByProcess(@PathVariable Long processId){
-        return ResponseEntity.ok(activityService.listByProcess(processId));
+    // ===== Listados =====
+    @GetMapping
+    public ResponseEntity<List<ActivityDTO>> list() {
+        return ResponseEntity.ok(activityService.listActiveOrInactive());
     }
 
-    // Por empresa (process.empresaId)
-    @GetMapping("/empresa/{empresaId}")
-    public ResponseEntity<List<ActivityDTO>> listByEmpresa(@PathVariable Long empresaId){
-        return ResponseEntity.ok(activityService.listByEmpresa(empresaId));
+    @GetMapping("/by-process/{processId}")
+    public ResponseEntity<List<ActivityDTO>> byProcess(@PathVariable Long processId) {
+        return ResponseEntity.ok(activityService.listByProcessId(processId));
     }
 
-    // Por status del proceso
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<ActivityDTO>> listByProcessStatus(@PathVariable String status){
+    @GetMapping("/by-empresa/{empresaId}")
+    public ResponseEntity<List<ActivityDTO>> byEmpresa(@PathVariable Long empresaId) {
+        return ResponseEntity.ok(activityService.listByEmpresaId(empresaId));
+    }
+
+    @GetMapping("/by-status/{status}")
+    public ResponseEntity<List<ActivityDTO>> byProcessStatus(@PathVariable String status) {
         return ResponseEntity.ok(activityService.listByProcessStatus(status));
     }
 
-    // Por categoría del proceso
-    @GetMapping("/category/{category}")
-    public ResponseEntity<List<ActivityDTO>> listByProcessCategory(@PathVariable String category){
-        return ResponseEntity.ok(activityService.listByProcessCategory(category));
+    @GetMapping("/by-category/{category}")
+    public ResponseEntity<List<ActivityDTO>> byCategory(@PathVariable String category) {
+        return ResponseEntity.ok(activityService.listByCategory(category));
     }
 
-    // Combinado empresa + status
-    @GetMapping("/empresa/{empresaId}/status/{status}")
-    public ResponseEntity<List<ActivityDTO>> listByEmpresaAndStatus(@PathVariable Long empresaId, @PathVariable String status){
+    @GetMapping("/by-empresa/{empresaId}/status/{status}")
+    public ResponseEntity<List<ActivityDTO>> byEmpresaAndStatus(@PathVariable Long empresaId,
+                                                                @PathVariable String status) {
         return ResponseEntity.ok(activityService.listByEmpresaAndStatus(empresaId, status));
     }
 }
