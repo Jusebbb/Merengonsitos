@@ -24,4 +24,7 @@ public class ProcessDTO {
 
     @NotNull
     private Long empresaId;
+
+    @NotNull
+    private Long rolId;
 }

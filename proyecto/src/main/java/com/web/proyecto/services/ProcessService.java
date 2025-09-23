@@ -5,6 +5,7 @@ import com.web.proyecto.entities.Process;
 import com.web.proyecto.entities.ProcessHistory;
 import com.web.proyecto.entities.ProcessStatus;
 import com.web.proyecto.repositories.ProcessRepository;
+import com.web.proyecto.repositories.RolRepository;
 import com.web.proyecto.repositories.ProcessHistoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +19,13 @@ public class ProcessService {
 
     private final ProcessRepository processRepository;
     private final ProcessHistoryRepository historyRepository;
+    private final RolRepository rolRepository;
 
     public ProcessService(ProcessRepository processRepository,
-                          ProcessHistoryRepository historyRepository) {
+                          ProcessHistoryRepository historyRepository, RolRepository rolRepository) {
         this.processRepository = processRepository;
         this.historyRepository = historyRepository;
+        this.rolRepository = rolRepository;
     }
 
     // Crear proceso
@@ -128,7 +131,8 @@ public class ProcessService {
                 entity.getDescription(),
                 entity.getCategory(),
                 entity.getStatus(),
-                entity.getEmpresaId()
+                entity.getEmpresaId(),
+                entity.getId()
         );
     }
 }
