@@ -23,13 +23,14 @@ public class Process {
     private String description;
 
     @Column(length = 45)
-    private String category;         
+    private String category;
 
-    @Column(length = 45, nullable = false)
-    private String status;      
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ProcessStatus status;
 
     @Column(name = "empresa_id", nullable = false)
-    private Long empresaId;       
+    private Long empresaId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "rol_id", nullable = false, foreignKey = @ForeignKey(name = "fk_process_rol"))
