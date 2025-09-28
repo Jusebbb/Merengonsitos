@@ -2,6 +2,8 @@ package com.web.proyecto.dtos;
 
 import java.time.LocalDateTime;
 
+import com.web.proyecto.entities.Empresa;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

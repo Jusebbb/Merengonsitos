@@ -1,10 +1,12 @@
 package com.web.proyecto.services;
 
 import com.web.proyecto.dtos.ProcessDTO;
+import com.web.proyecto.entities.Empresa;
 import com.web.proyecto.entities.Process;
 import com.web.proyecto.entities.Rol;
 import com.web.proyecto.repositories.ProcessRepository;
 import com.web.proyecto.repositories.RolRepository;
+import com.web.proyecto.repositories.EmpresaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,33 +23,36 @@ public class ProcessService {
 
     private final ProcessRepository processRepository;
     private final RolRepository rolRepository;
+    private final EmpresaRepository empresaRepository;
 
     // ================== HU-04: Crear proceso ==================
     public ProcessDTO create(ProcessDTO dto) {
-        if (dto == null) throw new IllegalArgumentException("Body vacío");
-        if (dto.getEmpresaId() == null) throw new IllegalArgumentException("empresaId is required");
-        if (dto.getRolId() == null) throw new IllegalArgumentException("rolId is required");
-        if (dto.getName() == null || dto.getName().isBlank()) throw new IllegalArgumentException("name is required");
+    if (dto == null) throw new IllegalArgumentException("Body vacío");
+    if (dto.getEmpresaId() == null) throw new IllegalArgumentException("empresaId is required");
+    if (dto.getRolId() == null) throw new IllegalArgumentException("rolId is required");
 
-        Rol rol = rolRepository.findById(dto.getRolId())
-                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + dto.getRolId()));
+    Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
+            .orElseThrow(() -> new IllegalArgumentException("Empresa not found: " + dto.getEmpresaId()));
 
-        if (!Objects.equals(rol.getEmpresa().getId(), dto.getEmpresaId())) {
-            throw new IllegalArgumentException("Role does not belong to the same empresa");
-        }
+    Rol rol = rolRepository.findById(dto.getRolId())
+            .orElseThrow(() -> new IllegalArgumentException("Role not found: " + dto.getRolId()));
 
-        Process entity = new Process();
-        entity.setName(dto.getName().trim());
-        entity.setDescription(dto.getDescription());
-        entity.setCategory(dto.getCategory());
-        entity.setEmpresaId(dto.getEmpresaId());
-        entity.setRol(rol);
-        // status default ACTIVE si no viene
-        entity.setStatus(normalizeOrDefault(dto.getStatus(), "ACTIVE"));
-
-        Process saved = processRepository.save(entity);
-        return toDTO(saved);
+    if (!Objects.equals(rol.getEmpresa().getId(), empresa.getId())) {
+        throw new IllegalArgumentException("Role does not belong to the same empresa");
     }
+
+    Process entity = new Process();
+    entity.setName(dto.getName().trim());
+    entity.setDescription(dto.getDescription());
+    entity.setCategory(dto.getCategory());
+    entity.setEmpresa(empresa);   // 🔹 ahora seteamos la entidad
+    entity.setRol(rol);
+    entity.setStatus(normalizeOrDefault(dto.getStatus(), "ACTIVE"));
+
+    Process saved = processRepository.save(entity);
+    return toDTO(saved);
+}
+
 
     // ================== Listas y búsquedas ==================
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
@@ -144,18 +149,20 @@ public class ProcessService {
     // ================== Helpers ==================
     private ProcessDTO toDTO(Process e) {
         Long rolId = (e.getRol() != null) ? e.getRol().getId() : null;
+        Long empresaId = (e.getEmpresa() != null) ? e.getEmpresa().getId() : null;
         ProcessDTO dto = new ProcessDTO();
         dto.setId(e.getId());
         dto.setName(e.getName());
         dto.setDescription(e.getDescription());
         dto.setCategory(e.getCategory());
         dto.setStatus(e.getStatus());
-        dto.setEmpresaId(e.getEmpresaId());
+        dto.setEmpresaId(empresaId);
         dto.setRolId(rolId);
         dto.setUpdatedAt(e.getUpdatedAt());
         dto.setUpdatedBy(e.getUpdatedBy());
         return dto;
     }
+
 
     private String normalize(String status) {
         if (status == null) return null;
