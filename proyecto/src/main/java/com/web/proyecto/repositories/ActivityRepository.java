@@ -11,6 +11,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     // dentro de un proceso concreto
     boolean existsByNameIgnoreCaseAndProcess_Id(String name, Long processId);
     List<Activity> findByProcess_Id(Long processId);
+    boolean existsByIdAndProcess_Id(Long id, Long processId);
 
     // paralelos a Process
     List<Activity> findByProcess_EmpresaId(Long empresaId);
