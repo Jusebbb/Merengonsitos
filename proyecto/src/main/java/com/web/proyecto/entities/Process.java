@@ -1,15 +1,12 @@
 package com.web.proyecto.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "process")
@@ -33,11 +30,16 @@ public class Process {
     @Column(nullable = false, length = 20)
     private String status = "ACTIVE";
 
-    @Column(name = "empresa_id", nullable = false)
-    private Long empresaId;
-
+    // ====== Many-to-One: Empresa (muchos procesos pertenecen a una empresa)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "rol_id", nullable = false, foreignKey = @ForeignKey(name = "fk_process_rol"))
+    @JoinColumn(name = "empresa_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_process_empresa"))
+    private Empresa empresa;
+
+    // ====== Many-to-One: Rol (muchos procesos pertenecen a un rol)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "rol_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_process_rol"))
     private Rol rol;
 
     @OneToMany(mappedBy = "process", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -56,7 +58,6 @@ public class Process {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // 🔹 Este sí debes setearlo en el Service con el usuario que edita
     @Column(name = "updated_by", length = 100)
     private String updatedBy;
 }

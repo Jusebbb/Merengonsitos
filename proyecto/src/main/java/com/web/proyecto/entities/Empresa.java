@@ -2,6 +2,8 @@ package com.web.proyecto.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,13 +25,19 @@ public class Empresa {
 
     @Column(nullable = false, length = 120)
     private String correoContacto;
-    
+
     @Column(nullable = false)
     private boolean active = true;
 
-    // Relación con usuarios
+    // Relación con usuarios (como ya la tenías)
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Usuario> usuarios;
+    private List<Usuario> usuarios = new ArrayList<>();
+
+    // ====== One-to-Many: una empresa tiene muchos procesos
+    @OneToMany(mappedBy = "empresa") // sin orphanRemoval para no borrar en cascada
+    private List<Process> processes = new ArrayList<>();
+
+    // (opcional, consistente) una empresa tiene muchos roles
+    @OneToMany(mappedBy = "empresa")
+    private List<Rol> roles = new ArrayList<>();
 }
-
-
