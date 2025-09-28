@@ -30,16 +30,16 @@ public class ProcessController {
     // ====== Listado simple ======
     @GetMapping
     public ResponseEntity<List<ProcessDTO>> list() {
-    return ResponseEntity.ok(service.listDto());
+        return ResponseEntity.ok(service.listDto());
     }
 
     // ====== Búsqueda con filtros (HU-07) ======
     //   GET /api/processes/search?empresaId=1&status=ACTIVE
     //   GET /api/processes/search?name=onboard
     @GetMapping("/search")
-    public ResponseEntity<List<Process>> search(@RequestParam(required = false) String name,
-                                                @RequestParam(required = false) String status,
-                                                @RequestParam(required = false) Long empresaId) {
+    public ResponseEntity<List<ProcessDTO>> search(@RequestParam(required = false) String name,
+                                                   @RequestParam(required = false) String status,
+                                                   @RequestParam(required = false) Long empresaId) {
         return ResponseEntity.ok(service.search(name, status, empresaId));
     }
 
@@ -52,15 +52,15 @@ public class ProcessController {
 
     // ====== Obtener procesos por empresa ======
     @GetMapping("/{empresaId}")
-    public ResponseEntity<Object> getByEmpresaId(@PathVariable Long empresaId) {
+    public ResponseEntity<List<ProcessDTO>> getByEmpresaId(@PathVariable Long empresaId) {
         return ResponseEntity.ok(service.getByEmpresaId(empresaId));
     }
 
     // ====== Actualizar en masa por empresa (HU-05 - auditoría ligera: updatedAt/updatedBy) ======
     @PutMapping("/{empresaId}")
-    public ResponseEntity<Object> updateByEmpresaId(@PathVariable Long empresaId,
-                                                    @RequestBody ProcessDTO dto,
-                                                    @RequestHeader(value = "X-User", required = false) String user) {
+    public ResponseEntity<List<ProcessDTO>> updateByEmpresaId(@PathVariable Long empresaId,
+                                                              @RequestBody ProcessDTO dto,
+                                                              @RequestHeader(value = "X-User", required = false) String user) {
         return ResponseEntity.ok(service.updateByEmpresaId(empresaId, dto, user));
     }
 

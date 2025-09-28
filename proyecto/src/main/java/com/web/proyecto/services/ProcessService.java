@@ -51,29 +51,29 @@ public class ProcessService {
 
     // ================== Listas y búsquedas ==================
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-public List<ProcessDTO> listDto() {
-    return processRepository.findAll().stream()
-            .map(this::toDTO)  // tu mapper a DTO (sin activities/arcs/gateways)
-            .toList();
-}
+    public List<ProcessDTO> listDto() {
+        return processRepository.findAll().stream()
+                .map(this::toDTO)
+                .toList();
+    }
 
-    // HU-07: búsqueda con filtros
-    public List<Process> search(String name, String status, Long empresaId) {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<ProcessDTO> search(String name, String status, Long empresaId) {
         String st = normalize(status);
+        List<Process> res;
 
         if (empresaId != null && st != null) {
-            return processRepository.findByEmpresaIdAndStatus(empresaId, st);
+            res = processRepository.findByEmpresaIdAndStatus(empresaId, st);
+        } else if (empresaId != null) {
+            res = processRepository.findByEmpresaId(empresaId);
+        } else if (st != null) {
+            res = processRepository.findByStatus(st);
+        } else if (name != null && !name.isBlank()) {
+            res = processRepository.findByNameContainingIgnoreCase(name.trim());
+        } else {
+            res = processRepository.findAll();
         }
-        if (empresaId != null) {
-            return processRepository.findByEmpresaId(empresaId);
-        }
-        if (st != null) {
-            return processRepository.findByStatus(st);
-        }
-        if (name != null && !name.isBlank()) {
-            return processRepository.findByNameContainingIgnoreCase(name.trim());
-        }
-        return processRepository.findAll();
+        return res.stream().map(this::toDTO).toList();
     }
 
     // ================== Obtener por empresa ==================
@@ -88,43 +88,42 @@ public List<ProcessDTO> listDto() {
 
     // ================== HU-05: Actualizar en masa por empresa ==================
     public List<ProcessDTO> updateByEmpresaId(Long empresaId, ProcessDTO dto, String user) {
-    List<Process> procesos = processRepository.findByEmpresaId(
-            Objects.requireNonNull(empresaId, "empresaId requerido"));
-    if (procesos.isEmpty()) {
-        throw new IllegalArgumentException("No processes found for empresaId: " + empresaId);
-    }
+        List<Process> procesos = processRepository.findByEmpresaId(
+                Objects.requireNonNull(empresaId, "empresaId requerido"));
+        if (procesos.isEmpty()) {
+            throw new IllegalArgumentException("No processes found for empresaId: " + empresaId);
+        }
 
-    for (Process p : procesos) {
-        if (dto.getName() != null && !dto.getName().isBlank()) {
-            p.setName(dto.getName().trim());
-        }
-        if (dto.getDescription() != null) {
-            p.setDescription(dto.getDescription());
-        }
-        if (dto.getCategory() != null) {
-            p.setCategory(dto.getCategory());
-        }
-        if (dto.getStatus() != null && !dto.getStatus().isBlank()) {
-            p.setStatus(dto.getStatus().toUpperCase());
-        }
-        if (dto.getRolId() != null) {
-            Rol rol = rolRepository.findById(dto.getRolId())
-                    .orElseThrow(() -> new IllegalArgumentException("Role not found: " + dto.getRolId()));
-            if (!Objects.equals(rol.getEmpresa().getId(), empresaId)) {
-                throw new IllegalArgumentException("Role does not belong to the same empresa");
+        for (Process p : procesos) {
+            if (dto.getName() != null && !dto.getName().isBlank()) {
+                p.setName(dto.getName().trim());
             }
-            p.setRol(rol);
+            if (dto.getDescription() != null) {
+                p.setDescription(dto.getDescription());
+            }
+            if (dto.getCategory() != null) {
+                p.setCategory(dto.getCategory());
+            }
+            if (dto.getStatus() != null && !dto.getStatus().isBlank()) {
+                p.setStatus(dto.getStatus().toUpperCase());
+            }
+            if (dto.getRolId() != null) {
+                Rol rol = rolRepository.findById(dto.getRolId())
+                        .orElseThrow(() -> new IllegalArgumentException("Role not found: " + dto.getRolId()));
+                if (!Objects.equals(rol.getEmpresa().getId(), empresaId)) {
+                    throw new IllegalArgumentException("Role does not belong to the same empresa");
+                }
+                p.setRol(rol);
+            }
+
+            p.setUpdatedAt(LocalDateTime.now());
+            p.setUpdatedBy(user);
         }
 
-        // Actualizar auditoría
-        p.setUpdatedAt(LocalDateTime.now());
-        p.setUpdatedBy(user); // este "user" lo puedes pasar desde el controller
+        List<Process> saved = processRepository.saveAll(procesos);
+        return saved.stream().map(this::toDTO).toList();
     }
 
-    List<Process> saved = processRepository.saveAll(procesos);
-    return saved.stream().map(this::toDTO).toList();
-    }
-    // ================== HU-06: Soft delete ==================
     public void inactivateByEmpresaId(Long empresaId, String user) {
         List<Process> procesos = processRepository.findByEmpresaId(
                 Objects.requireNonNull(empresaId, "empresaId requerido"));
@@ -141,7 +140,6 @@ public List<ProcessDTO> listDto() {
         }
         processRepository.saveAll(procesos);
     }
-
 
     // ================== Helpers ==================
     private ProcessDTO toDTO(Process e) {
@@ -171,9 +169,8 @@ public List<ProcessDTO> listDto() {
     }
 
     // en ProcessService
-public Process findFullById(Long id) {
-    return processRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Process not found: " + id));
-}
-
+    public Process findFullById(Long id) {
+        return processRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Process not found: " + id));
+    }
 }
