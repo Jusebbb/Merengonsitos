@@ -22,7 +22,7 @@ public class Gateway {
     private String type;   // EXCLUSIVE, PARALLEL, etc.
 
     @Column(name = "condition_expr", length = 255)
-    private String condition; // condición para la rama
+    private String condition; 
 
     @Column(nullable = false, length = 20)
     private String status;

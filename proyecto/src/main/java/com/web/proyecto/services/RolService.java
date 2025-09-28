@@ -20,7 +20,7 @@ public class RolService {
 
     private final RolRepository rolRepository;
     private final EmpresaRepository empresaRepository;
-    private final ProcessRepository processRepository; // 🔹 ahora contamos procesos
+    private final ProcessRepository processRepository;
 
     /* ====== Mappers ====== */
     private RolDTO toDTO(Rol r, Long usageCount) {
