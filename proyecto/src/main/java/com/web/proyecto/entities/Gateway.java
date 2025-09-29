@@ -22,7 +22,7 @@ public class Gateway {
     private String type;   // EXCLUSIVE, PARALLEL, etc.
 
     @Column(name = "condition_expr", length = 255)
-    private String condition; // condición para la rama
+    private String condition; 
 
     @Column(nullable = false, length = 20)
     private String status;
@@ -30,8 +30,10 @@ public class Gateway {
     @Column(length = 255)
     private String description;
 
-    @Column(name = "process_id", nullable = false)
-    private Long processId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "process_id", nullable = false,
+                foreignKey = @ForeignKey(name = "fk_gateway_process"))
+    private Process process;
 
     @Column(name = "source_activity_id", nullable = false)
     private Long sourceActivityId;

@@ -9,7 +9,6 @@ public class EdgeDTO {
     private Long sourceId;
     private Long targetId;
 
-    private String description; // opcional (<=45)
-    private String status;      // opcional: "ACTIVE"/"INACTIVE" (si viene null, se pone ACTIVE en @PrePersist)
+    private String description; 
+    private String status;
 }
-

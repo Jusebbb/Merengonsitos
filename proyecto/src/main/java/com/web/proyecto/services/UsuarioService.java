@@ -39,6 +39,7 @@ public class UsuarioService {
                 .email(dto.getEmail())
                 .password(dto.getPassword())
                 .empresa(empresa)
+                .rol("USER")  // Asignar rol por defecto
                 .build();
     }
 

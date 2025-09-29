@@ -7,22 +7,126 @@ import com.web.proyecto.entities.Process;
 import com.web.proyecto.repositories.ActivityRepository;
 import com.web.proyecto.repositories.EdgeRepository;
 import com.web.proyecto.repositories.ProcessRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class EdgeService {
 
-    private final EdgeRepository repo;
+    private final EdgeRepository edgeRepo;
     private final ProcessRepository processRepo;
     private final ActivityRepository activityRepo;
 
-    // --------- Mappers ----------
+    public List<EdgeDTO> listAll() {
+        return edgeRepo.findAll().stream().map(this::toDTO).toList();
+    }
+
+    public List<EdgeDTO> listByProcess(Long processId) {
+        return edgeRepo.findByProcess_Id(processId).stream().map(this::toDTO).toList();
+    }
+
+    public EdgeDTO getById(Long id) {
+        return edgeRepo.findById(id).map(this::toDTO)
+                .orElseThrow(() -> new NoSuchElementException("Edge not found: " + id));
+    }
+
+    public EdgeDTO create(EdgeDTO dto) {
+        if (dto.getProcessId() == null) throw new IllegalArgumentException("processId is required");
+        if (dto.getSourceId() == null)  throw new IllegalArgumentException("sourceId is required");
+        if (dto.getTargetId() == null)  throw new IllegalArgumentException("targetId is required");
+        if (Objects.equals(dto.getSourceId(), dto.getTargetId()))
+            throw new IllegalArgumentException("sourceId and targetId must be different");
+
+        Process p = processRepo.findById(dto.getProcessId())
+                .orElseThrow(() -> new NoSuchElementException("Process not found: " + dto.getProcessId()));
+        Activity s = activityRepo.findById(dto.getSourceId())
+                .orElseThrow(() -> new NoSuchElementException("Activity (source) not found: " + dto.getSourceId()));
+        Activity t = activityRepo.findById(dto.getTargetId())
+                .orElseThrow(() -> new NoSuchElementException("Activity (target) not found: " + dto.getTargetId()));
+
+        if (!Objects.equals(s.getProcess().getId(), p.getId()))
+            throw new IllegalArgumentException("sourceId does not belong to process " + p.getId());
+        if (!Objects.equals(t.getProcess().getId(), p.getId()))
+            throw new IllegalArgumentException("targetId does not belong to process " + p.getId());
+
+        // Idempotente: si ya existe, devuelve el existente (no 500, no 409)
+        if (edgeRepo.existsByProcess_IdAndSource_IdAndTarget_Id(p.getId(), s.getId(), t.getId())) {
+            return edgeRepo.findByProcess_Id(p.getId()).stream()
+                    .filter(e -> e.getSource().getId().equals(s.getId()) && e.getTarget().getId().equals(t.getId()))
+                    .findFirst().map(this::toDTO).orElseThrow();
+        }
+
+        Edge e = new Edge();
+        e.setProcess(p);
+        e.setSource(s);
+        e.setTarget(t);
+        e.setDescription(trim45(dto.getDescription()));
+        e.setStatus(normalizeOrDefault(dto.getStatus(), "ACTIVE"));
+
+        return toDTO(edgeRepo.save(e));
+    }
+
+    public EdgeDTO update(Long id, EdgeDTO dto) {
+        Edge e = edgeRepo.findById(id).orElseThrow(() -> new NoSuchElementException("Edge not found: " + id));
+
+        if (dto.getProcessId() != null && !dto.getProcessId().equals(e.getProcess().getId())) {
+            Process p = processRepo.findById(dto.getProcessId())
+                    .orElseThrow(() -> new NoSuchElementException("Process not found: " + dto.getProcessId()));
+            e.setProcess(p);
+        }
+        if (dto.getSourceId() != null) {
+            Activity s = activityRepo.findById(dto.getSourceId())
+                    .orElseThrow(() -> new NoSuchElementException("Activity (source) not found: " + dto.getSourceId()));
+            e.setSource(s);
+        }
+        if (dto.getTargetId() != null) {
+            Activity t = activityRepo.findById(dto.getTargetId())
+                    .orElseThrow(() -> new NoSuchElementException("Activity (target) not found: " + dto.getTargetId()));
+            e.setTarget(t);
+        }
+
+        Long pid = e.getProcess().getId();
+        if (Objects.equals(e.getSource().getId(), e.getTarget().getId()))
+            throw new IllegalArgumentException("sourceId and targetId must be different");
+        if (!Objects.equals(e.getSource().getProcess().getId(), pid) ||
+            !Objects.equals(e.getTarget().getProcess().getId(), pid))
+            throw new IllegalArgumentException("source/target must belong to process " + pid);
+
+        // Evita duplicado contra otros edges
+        if (edgeRepo.existsByProcess_IdAndSource_IdAndTarget_Id(pid, e.getSource().getId(), e.getTarget().getId())) {
+            boolean otherExists = edgeRepo.findByProcess_Id(pid).stream()
+                .anyMatch(x -> !x.getId().equals(e.getId())
+                        && x.getSource().getId().equals(e.getSource().getId())
+                        && x.getTarget().getId().equals(e.getTarget().getId()));
+            if (otherExists) throw new IllegalArgumentException("Edge already exists for (processId, sourceId, targetId)");
+        }
+
+        if (dto.getDescription() != null) e.setDescription(trim45(dto.getDescription()));
+        if (dto.getStatus() != null)      e.setStatus(normalize(dto.getStatus()));
+
+        return toDTO(edgeRepo.save(e));
+    }
+
+    public void delete(Long id) {
+        if (!edgeRepo.existsById(id)) throw new NoSuchElementException("Edge not found: " + id);
+        edgeRepo.deleteById(id);
+    }
+
+    private String trim45(String s) {
+        if (s == null) return null;
+        String t = s.trim();
+        return t.length() <= 45 ? t : t.substring(0, 45);
+    }
+    private String normalize(String s) { return (s == null || s.isBlank()) ? null : s.trim().toUpperCase(); }
+    private String normalizeOrDefault(String s, String def) { String n = normalize(s); return n == null ? def : n; }
+
     private EdgeDTO toDTO(Edge e) {
         return EdgeDTO.builder()
                 .id(e.getId())
@@ -33,99 +137,4 @@ public class EdgeService {
                 .status(e.getStatus())
                 .build();
     }
-
-    // Crea/actualiza a partir de IDs (busca entidades para validar)
-    private void setRefsFromDto(Edge e, EdgeDTO d) {
-        if (d.getProcessId() != null) {
-            Process p = processRepo.findById(d.getProcessId())
-                    .orElseThrow(() -> new IllegalArgumentException("Process no encontrado: " + d.getProcessId()));
-            e.setProcess(p);
-        }
-        if (d.getSourceId() != null) {
-            Activity a = activityRepo.findById(d.getSourceId())
-                    .orElseThrow(() -> new IllegalArgumentException("Activity (source) no encontrada: " + d.getSourceId()));
-            e.setSource(a);
-        }
-        if (d.getTargetId() != null) {
-            Activity a = activityRepo.findById(d.getTargetId())
-                    .orElseThrow(() -> new IllegalArgumentException("Activity (target) no encontrada: " + d.getTargetId()));
-            e.setTarget(a);
-        }
-    }
-
-    private void validateBusiness(Edge e) {
-        Long pId = e.getProcess().getId();
-        if (!e.getSource().getProcess().getId().equals(pId) ||
-            !e.getTarget().getProcess().getId().equals(pId)) {
-            throw new IllegalArgumentException("Source y Target deben pertenecer al mismo Process " + pId);
-        }
-        if (e.getSource().getId().equals(e.getTarget().getId())) {
-            throw new IllegalArgumentException("Source y Target no pueden ser la misma Activity");
-        }
-        // Duplicado (tripleta)
-        if (repo.existsByProcess_IdAndSource_IdAndTarget_Id(
-                e.getProcess().getId(), e.getSource().getId(), e.getTarget().getId())) {
-            // En update, permite si es el mismo registro
-            if (e.getId() == null ||
-                repo.findById(e.getId()).map(x ->
-                        !(x.getProcess().getId().equals(e.getProcess().getId()) &&
-                          x.getSource().getId().equals(e.getSource().getId()) &&
-                          x.getTarget().getId().equals(e.getTarget().getId()))
-                ).orElse(true)) {
-                throw new IllegalArgumentException("Ya existe un Edge con esa combinación (process, source, target)");
-            }
-        }
-    }
-
-    // --------- CRUD ----------
-    public EdgeDTO create(EdgeDTO dto) {
-        Edge e = new Edge();
-        setRefsFromDto(e, dto);
-        e.setDescription(dto.getDescription());
-        e.setStatus(dto.getStatus()); // @PrePersist pondrá ACTIVE si viene null
-        validateBusiness(e);
-
-        Edge saved = repo.save(e);
-        return toDTO(saved);
-    }
-
-    public EdgeDTO update(Long id, EdgeDTO dto) {
-        Edge e = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Edge no encontrado: " + id));
-
-        // Si algún id no viene, se mantiene el actual
-        EdgeDTO merged = EdgeDTO.builder()
-                .processId(dto.getProcessId() != null ? dto.getProcessId() : e.getProcess().getId())
-                .sourceId(dto.getSourceId()   != null ? dto.getSourceId()   : e.getSource().getId())
-                .targetId(dto.getTargetId()   != null ? dto.getTargetId()   : e.getTarget().getId())
-                .description(dto.getDescription() != null ? dto.getDescription() : e.getDescription())
-                .status(dto.getStatus() != null && !dto.getStatus().isBlank() ? dto.getStatus() : e.getStatus())
-                .build();
-
-        setRefsFromDto(e, merged);
-        e.setDescription(merged.getDescription());
-        e.setStatus(merged.getStatus());
-        validateBusiness(e);
-
-        return toDTO(repo.save(e));
-    }
-
-    @Transactional(readOnly = true)
-    public EdgeDTO getById(Long id) {
-        return repo.findById(id).map(this::toDTO)
-                .orElseThrow(() -> new IllegalArgumentException("Edge no encontrado: " + id));
-    }
-
-    @Transactional(readOnly = true)
-    public List<EdgeDTO> list() {
-        return repo.findAll().stream().map(this::toDTO).toList();
-    }
-
-    public void delete(Long id) {
-        if (!repo.existsById(id)) {
-            throw new IllegalArgumentException("Edge no encontrado: " + id);
-        }
-        repo.deleteById(id);
-    }
 }
-

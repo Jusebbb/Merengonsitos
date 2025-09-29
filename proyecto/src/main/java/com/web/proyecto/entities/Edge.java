@@ -28,12 +28,14 @@ public class Edge {
     @JoinColumn(name = "process_id", nullable = false)
     private Process process;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_activity_id", nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "source_activity_id", nullable = false,
+        foreignKey = @ForeignKey(name = "fk_edge_source_activity"))
     private Activity source;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_activity_id", nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "target_activity_id", nullable = false,
+        foreignKey = @ForeignKey(name = "fk_edge_target_activity"))
     private Activity target;
 
     @PrePersist
@@ -41,4 +43,3 @@ public class Edge {
         if (status == null || status.isBlank()) status = "ACTIVE";
     }
 }
-
