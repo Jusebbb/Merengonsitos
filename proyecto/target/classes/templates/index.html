@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SistemaProcesos – Inicio</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+  <style>
+    :root{
+      --bg-1:#eaf4ff; --bg-2:#cfe6ff;
+      --primary:#1e88e5; --primary-dark:#1565c0; --accent:#8ec9ff;
+      --card:#fff; --soft:#eaf5ff; --text:#223041; --muted:#6b7b8a;
+      --shadow:0 14px 30px rgba(20,65,120,.12);
+      --border:#e7eef7;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 100%);
+      min-height:100vh;
+    }
+
+    /* === Navbar === */
+    .navbar{
+      position:sticky; top:0; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 22px; background:rgba(255,255,255,.75);
+      backdrop-filter: blur(6px);
+      border-bottom:1px solid var(--border);
+    }
+    .logo{
+      font-weight:800; font-size:20px; letter-spacing:.2px; color:var(--text);
+    }
+    .logo .highlight{ color:var(--primary); }
+    .nav{
+      display:flex; gap:10px;
+    }
+    .nav a{
+      display:inline-block; padding:10px 14px; border-radius:10px;
+      text-decoration:none; color:var(--text); font-weight:600;
+    }
+    .nav a:hover{ background:var(--soft); }
+    .nav a.active{ color:#fff; background:var(--primary); }
+
+    /* === Hero === */
+    .hero{
+      max-width:1100px; margin:40px auto 10px; padding:0 18px;
+      text-align:center;
+    }
+    .hero h1{
+      font-size:36px; font-weight:800; color:var(--primary);
+      margin-bottom:6px;
+    }
+    .hero p{ color:var(--muted) }
+
+    /* === Tarjetas === */
+    .grid{
+      max-width:1100px; margin:22px auto; padding:0 18px;
+      display:grid; grid-template-columns:repeat(12,1fr); gap:16px;
+    }
+    .card{
+      grid-column:span 12; background:var(--card);
+      border:1px solid var(--border); border-radius:14px;
+      box-shadow:var(--shadow); padding:16px 18px;
+    }
+    @media (min-width:760px){
+      .card{ grid-column:span 4; }
+    }
+    .card h3{ color:var(--primary); margin-bottom:6px }
+    .card p{ color:var(--muted); margin-bottom:12px }
+    .card .btn{
+      display:inline-block; padding:10px 12px; border-radius:10px;
+      background:var(--primary); color:#fff; text-decoration:none; font-weight:700;
+    }
+    .card .btn:hover{ background:var(--primary-dark) }
+
+    /* Footer mini */
+    .foot{ text-align:center; color:var(--muted); margin:34px 0 20px }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="navbar">
+    <div class="logo">Sistema<span class="highlight">Procesos</span></div>
+    <nav class="nav">
+      <a th:href="@{/'/'}" th:classappend="${active}=='home'?' active'">Inicio</a>
+      <a th:href="@{/procesos}" th:classappend="${active}=='procesos'?' active'">Procesos</a>
+      <a th:href="@{/admin}" th:classappend="${active}=='admin'?' active'">Admin</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Bienvenido</h1>
+    <p>Gestiona y modela tus procesos empresariales en un solo lugar.</p>
+  </section>
+
+  <!-- CARDS -->
+  <section class="grid">
+    <div class="card">
+      <h3>Procesos</h3>
+      <p>Consulta, crea y edita procesos. Filtra por estado o categoría.</p>
+      <a class="btn" th:href="@{/procesos}">Ir a Procesos</a>
+    </div>
+
+    <div class="card">
+      <h3>Administración</h3>
+      <p>Gestiona usuarios y roles de proceso para tu organización.</p>
+      <a class="btn" th:href="@{/admin}">Abrir Admin</a>
+    </div>
+
+    <div class="card">
+      <h3>Guía rápida</h3>
+      <p>Aprende a crear actividades, arcos y gateways en minutos.</p>
+      <a class="btn" th:href="@{/documentacion}" >Ver documentación</a>
+    </div>
+  </section>
+
+  <p class="foot">© SistemaProcesos</p>
+
+</body>
+</html>
