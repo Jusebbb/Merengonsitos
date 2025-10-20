@@ -1,0 +1,29 @@
+.auth-card {
+    max-width: 380px;
+    margin: 6rem auto;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    display: grid;
+    gap: .75rem;
+
+    h1 { margin-bottom: .25rem; }
+
+    label { font-size: .9rem; margin-top: .5rem; }
+    input {
+        width: 100%;
+        padding: .65rem .8rem;
+        border: 1px solid #dcdcdc;
+        border-radius: .6rem;
+        &:focus { outline: none; border-color: #5c8c5f; box-shadow: 0 0 0 3px rgba(92,140,95,.15); }
+    }
+
+    small { color: #b00020; }
+    button {
+        margin-top: .25rem; padding: .75rem 1rem; border: 0; border-radius: .7rem;
+        background: #1b4332; color: #fff; cursor: pointer;
+    } 
+
+    .alt { text-align: center; margin-top: .5rem; }
+    a { color: #1b4332; text-decoration: none; }
+}
