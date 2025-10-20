@@ -17,7 +17,7 @@ public class ActivityDTO {
     private String type;
     private String description;
     @Column(name = "rol_id", nullable = true)
-private Long roleId;
+    private Long roleId;
 
 
     /** String (no enum) */

@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "ProyectoApplication",
+            "request": "launch",
+            "mainClass": "com.web.proyecto.ProyectoApplication",
+            "projectName": "proyecto"
+        },
+        {
             "type": "chrome",
             "request": "launch",
             "name": "Open login.html",
