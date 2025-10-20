@@ -1,11 +1,45 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-register',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './register.html',
-  styleUrl: './register.scss'
+  styleUrls: ['./register.scss'],
 })
-export class Register {
+export class RegisterComponent {
+  form!: FormGroup;
 
+  constructor(private fb: FormBuilder) {
+    this.form = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirm: ['', [Validators.required, Validators.minLength(6)]],
+    });
+  }
+
+  get f() { return this.form.controls; }
+
+  samePassword(): boolean {
+    const p = this.form.get('password')?.value;
+    const c = this.form.get('confirm')?.value;
+    return !!p && !!c && p === c;
+  }
+
+  onSubmit() {
+    if (this.form.invalid || !this.samePassword()) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    // Solo demo (sin backend aún)
+    console.log('REGISTER =>', {
+      name: this.form.value.name,
+      email: this.form.value.email,
+      password: this.form.value.password,
+    });
+  }
 }
