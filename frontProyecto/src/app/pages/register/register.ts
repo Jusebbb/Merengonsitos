@@ -22,7 +22,8 @@ export class RegisterComponent {
     });
   }
 
-  get f() { return this.form.controls; }
+  // Alias para controles (usaremos corchetes en la plantilla)
+  get c() { return this.form.controls; }
 
   samePassword(): boolean {
     const p = this.form.get('password')?.value;
@@ -35,7 +36,6 @@ export class RegisterComponent {
       this.form.markAllAsTouched();
       return;
     }
-    // Solo demo (sin backend aún)
     console.log('REGISTER =>', {
       name: this.form.value.name,
       email: this.form.value.email,
