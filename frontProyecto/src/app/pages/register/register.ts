@@ -19,11 +19,15 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirm: ['', [Validators.required, Validators.minLength(6)]],
+      role: ['empleado', [Validators.required]],
     });
   }
 
-  // Alias para controles (usaremos corchetes en la plantilla)
   get c() { return this.form.controls; }
+
+  setRole(role: 'administrador' | 'empleado') {
+    this.form.get('role')?.setValue(role);
+  }
 
   samePassword(): boolean {
     const p = this.form.get('password')?.value;
@@ -40,6 +44,7 @@ export class RegisterComponent {
       name: this.form.value.name,
       email: this.form.value.email,
       password: this.form.value.password,
+      role: this.form.value.role,                             // 👈 incluido
     });
   }
 }

@@ -19,6 +19,28 @@
       </div>
 
       <div class="field">
+        <label>Tipo de usuario</label>
+        <div class="seg-group" role="group" aria-label="Tipo de usuario">
+          <button
+            type="button"
+            class="seg-btn"
+            [class.active]="c['role'].value === 'empleado'"
+            (click)="setRole('empleado')"
+            [attr.aria-pressed]="c['role'].value === 'empleado'">
+            Empleado
+          </button>
+          <button
+            type="button"
+            class="seg-btn"
+            [class.active]="c['role'].value === 'administrador'"
+            (click)="setRole('administrador')"
+            [attr.aria-pressed]="c['role'].value === 'administrador'">
+            Administrador
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
         <label for="confirm">Confirmar contraseña</label>
         <input id="confirm" type="password" formControlName="confirm" placeholder="••••••" />
       </div>

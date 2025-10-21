@@ -133,3 +133,31 @@
   --brand-blue-2: #2b84e0;
   --brand-blue-soft: #b8e2f6;
 }
+
+.seg-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.seg-btn {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #dfe7f1;
+  background: #f7fbff;
+  color: #2b75d1;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .2s ease, box-shadow .2s ease, transform .02s ease;
+
+  &:hover { background: #eef6ff; }
+  &:active { transform: translateY(1px); }
+
+  &.active {
+    background: #2a7de1;
+    color: #fff;
+    border-color: #2a7de1;
+    box-shadow: 0 8px 16px rgba(42,125,225,.25);
+  }
+}
+
