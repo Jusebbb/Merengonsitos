@@ -29,7 +29,6 @@
         <label for="confirm">Confirmar contraseña</label>
         <input id="confirm" type="password" formControlName="confirm" placeholder="••••••••" />
 
-        <!-- Selector de rol (botones segmentados) -->
         <div class="field">
           <label>Tipo de usuario</label>
           <div class="seg-group" role="group" aria-label="Tipo de usuario">
@@ -37,7 +36,7 @@
               type="button"
               class="seg-btn"
               [class.active]="c['role'].value === 'empleado'"
-              (click)="setRole('empleado')"
+              (click)="goToRole('empleado')"
               [attr.aria-pressed]="c['role'].value === 'empleado'">
               Empleado
             </button>
@@ -45,14 +44,18 @@
               type="button"
               class="seg-btn"
               [class.active]="c['role'].value === 'administrador'"
-              (click)="setRole('administrador')"
+              (click)="goToRole('administrador')"
               [attr.aria-pressed]="c['role'].value === 'administrador'">
               Administrador
             </button>
           </div>
         </div>
 
-        <button class="btn-primary" type="submit">Registrarme</button>
+
+      <button class="btn-primary" type="submit" [disabled]="form.invalid || !samePassword()">
+        Registrarme
+      </button>
+
       </form>
 
       <p class="register">

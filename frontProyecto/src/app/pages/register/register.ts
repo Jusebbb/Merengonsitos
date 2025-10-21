@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -13,7 +13,7 @@ import { RouterModule } from '@angular/router';
 export class RegisterComponent {
   form!: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
@@ -25,8 +25,14 @@ export class RegisterComponent {
 
   get c() { return this.form.controls; }
 
-  setRole(role: 'administrador' | 'empleado') {
-    this.form.get('role')?.setValue(role);
+  private setRole(role: 'empleado' | 'administrador') {
+    this.form.patchValue({ role });
+  }
+
+  // Navega inmediatamente según el botón pulsado
+  goToRole(role: 'empleado' | 'administrador') {
+    this.setRole(role);
+    this.router.navigateByUrl(role === 'administrador' ? '/inicio-admin' : '/inicio-usuario');
   }
 
   samePassword(): boolean {
@@ -40,11 +46,12 @@ export class RegisterComponent {
       this.form.markAllAsTouched();
       return;
     }
-    console.log('REGISTER =>', {
-      name: this.form.value.name,
-      email: this.form.value.email,
-      password: this.form.value.password,
-      role: this.form.value.role,                             // 👈 incluido
-    });
+
+    // Demo: podrías mandar el payload al backend aquí.
+    console.log('REGISTER =>', this.form.value);
+
+    // Redirige según el rol seleccionado
+    const role = this.form.value.role as 'empleado' | 'administrador';
+    this.router.navigateByUrl(role === 'administrador' ? '/inicio-admin' : '/inicio-usuario');
   }
 }
