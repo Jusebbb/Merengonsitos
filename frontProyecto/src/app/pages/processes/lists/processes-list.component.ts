@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ProcessesService } from '../processes.service';
-import { ProcessDTO } from '../../dtos/processDto';
+import { ProcessDTO } from '../../../dtos/processDto';
 
 @Component({
   selector: 'app-processes-list',

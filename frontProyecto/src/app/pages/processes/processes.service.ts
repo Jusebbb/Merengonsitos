@@ -2,10 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { ProcessDTO } from '../dtos/processDto';
-import { ActivityDTO } from '../dtos/activityDto';
-import { EdgeDTO } from '../dtos/edgeDto';
-import { GatewayDTO } from '../dtos/gatewayDto';
+import { ProcessDTO } from '../../dtos/processDto';
+import { ActivityDTO } from '../../dtos/activityDto';
+import { EdgeDTO } from '../../dtos/edgeDto';
+import { GatewayDTO } from '../../dtos/gatewayDto';
 
 @Injectable({ providedIn: 'root' })
 export class ProcessesService {

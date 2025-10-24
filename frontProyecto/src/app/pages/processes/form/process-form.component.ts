@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, Validators, NonNullableFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProcessesService } from '../processes.service';
-import { ProcessDTO, ProcessStatus } from '../../dtos/processDto';
+import { ProcessDTO, ProcessStatus } from '../../../dtos/processDto';
 
 @Component({
   selector: 'app-process-form',

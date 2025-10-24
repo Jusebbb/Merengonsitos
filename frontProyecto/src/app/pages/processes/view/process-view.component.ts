@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProcessesService } from '../processes.service';
-import { ProcessDTO } from '../../dtos/processDto';
+import { ProcessDTO } from '../../../dtos/processDto';
 
 @Component({
   selector: 'app-process-view',
