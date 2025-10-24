@@ -1,0 +1,12 @@
+<h2>Proceso: {{ process?.name }}</h2>
+<p class="muted">{{ process?.description }}</p>
+
+<nav class="tabs">
+  <a [routerLink]="['info']" routerLinkActive="active">Info general</a>
+  <a [routerLink]="['activities']" routerLinkActive="active">Actividades</a>
+  <a [routerLink]="['arcs']" routerLinkActive="active">Arcos</a>
+  <a [routerLink]="['gateways']" routerLinkActive="active">Gateways</a>
+  <a [routerLink]="['history']" routerLinkActive="active">Historial</a>
+</nav>
+
+<router-outlet></router-outlet>

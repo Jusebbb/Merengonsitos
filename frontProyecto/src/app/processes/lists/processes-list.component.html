@@ -1,0 +1,33 @@
+<h2>Procesos</h2>
+
+<form (ngSubmit)="fetch()" class="filters">
+  <input [(ngModel)]="q" name="q" placeholder="Buscar..." />
+  <select [(ngModel)]="status" name="status">
+    <option value="">Todos</option>
+    <option value="DRAFT">Borrador</option>
+    <option value="ACTIVE">Activo</option>
+    <option value="ARCHIVED">Archivado</option>
+  </select>
+  <button type="submit">Filtrar</button>
+  <a routerLink="/processes/new">Nuevo</a>
+</form>
+
+<table *ngIf="!loading()">
+  <thead>
+    <tr><th>Nombre</th><th>Estado</th><th>Actualizado</th><th>Acciones</th></tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let p of rows()">
+      <td>{{ p.name }}</td>
+      <td>{{ p.status }}</td>
+      <td>{{ p.updatedAt | date:'short' }}</td>
+      <td>
+        <a [routerLink]="['/processes', p.id]">Ver</a>
+        <a [routerLink]="['/processes', p.id, 'edit']">Editar</a>
+        <button (click)="onDelete(p)">Eliminar</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="loading()">Cargando...</p>
