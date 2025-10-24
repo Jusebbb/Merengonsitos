@@ -1,0 +1,4 @@
+.tabs { display:flex; gap:1rem; margin:1rem 0; }
+.tabs a { text-decoration:none; padding:.25rem .5rem; border-radius:.25rem; }
+.tabs a.active { background:#efefef; }
+.muted { color:#666; }
