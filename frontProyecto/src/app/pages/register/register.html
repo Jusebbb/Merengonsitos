@@ -1,5 +1,5 @@
 <div class="login-container">
-  <!-- IZQUIERDA (igual al login) -->
+  <!-- IZQUIERDA -->
   <div class="login-left">
     <div class="left-content">
       <img src="/assets/loginImagenn.png" alt="Imagen decorativa" class="left-illustration" />
@@ -17,45 +17,57 @@
       <h2>Crear cuenta</h2>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
-        <label for="name">Nombre</label>
-        <input id="name" type="text" formControlName="name" placeholder="Tu nombre" />
-
-        <label for="email">Correo electrónico</label>
-        <input id="email" type="email" formControlName="email" placeholder="email@dominio.com" />
-
-        <label for="password">Contraseña</label>
-        <input id="password" type="password" formControlName="password" placeholder="••••••••" />
-
-        <label for="confirm">Confirmar contraseña</label>
-        <input id="confirm" type="password" formControlName="confirm" placeholder="••••••••" />
-
-        <div class="field">
-          <label>Tipo de usuario</label>
-          <div class="seg-group" role="group" aria-label="Tipo de usuario">
-            <button
-              type="button"
-              class="seg-btn"
-              [class.active]="c['role'].value === 'empleado'"
-              (click)="goToRole('empleado')"
-              [attr.aria-pressed]="c['role'].value === 'empleado'">
-              Empleado
-            </button>
-            <button
-              type="button"
-              class="seg-btn"
-              [class.active]="c['role'].value === 'administrador'"
-              (click)="goToRole('administrador')"
-              [attr.aria-pressed]="c['role'].value === 'administrador'">
-              Administrador
-            </button>
-          </div>
+        <!-- Selector de rol -->
+        <label>Tipo de usuario</label>
+        <div class="seg-group" role="group" aria-label="Tipo de usuario">
+          <button type="button"
+                  class="seg-btn"
+                  [class.active]="c['role'].value === 'empleado'"
+                  (click)="setRole('empleado')">
+            Empleado
+          </button>
+          <button type="button"
+                  class="seg-btn"
+                  [class.active]="c['role'].value === 'administrador'"
+                  (click)="setRole('administrador')">
+            Administrador
+          </button>
         </div>
 
+        <!-- FORM EMPLEADO -->
+        <ng-container *ngIf="c['role'].value === 'empleado'">
+          <label for="name">Nombre</label>
+          <input id="name" type="text" formControlName="name" placeholder="Tu nombre" />
 
-      <button class="btn-primary" type="submit" [disabled]="form.invalid || !samePassword()">
-        Registrarme
-      </button>
+          <label for="email">Correo electrónico</label>
+          <input id="email" type="email" formControlName="email" placeholder="email@dominio.com" />
 
+          <label for="password">Contraseña</label>
+          <input id="password" type="password" formControlName="password" placeholder="••••••••" />
+
+          <label for="confirm">Confirmar contraseña</label>
+          <input id="confirm" type="password" formControlName="confirm" placeholder="••••••••" />
+
+          <label for="empresaId">ID de empresa</label>
+          <input id="empresaId" type="number" formControlName="empresaId" placeholder="Ej: 123" />
+        </ng-container>
+
+        <!-- FORM EMPRESA (ADMIN) -->
+        <ng-container *ngIf="c['role'].value === 'administrador'">
+          <label for="empresaNombre">Nombre de la empresa</label>
+          <input id="empresaNombre" type="text" formControlName="empresaNombre" placeholder="Mi Empresa S.A.S" />
+
+          <label for="nit">NIT</label>
+          <input id="nit" type="text" formControlName="nit" placeholder="900123456-7" />
+
+          <label for="correoContacto">Correo de contacto</label>
+          <input id="correoContacto" type="email" formControlName="correoContacto" placeholder="contacto@empresa.com" />
+        </ng-container>
+
+        <button class="btn-primary" type="submit"
+          [disabled]="form.invalid || (c['role'].value === 'empleado' && !samePassword())">
+          Registrarme
+        </button>
       </form>
 
       <p class="register">
