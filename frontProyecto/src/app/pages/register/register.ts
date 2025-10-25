@@ -140,7 +140,7 @@ export class RegisterComponent {
         },
       });
     } else {
-      // Mapeo a EmpresaDTO: nombre <- empresaNombre
+      
       const payloadEmpresa = {
         nombre: this.c['nombre'].value,
         nit: this.c['nit'].value,

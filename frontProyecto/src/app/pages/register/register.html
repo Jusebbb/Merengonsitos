@@ -52,17 +52,17 @@
           <input id="empresaId" type="number" formControlName="empresaId" placeholder="Ej: 3" />
         </ng-container>
 
-        <!-- FORM EMPRESA (ADMIN) -->
         <ng-container *ngIf="c['role'].value === 'administrador'">
-          <label for="empresaNombre">Nombre de la empresa</label>
-          <input id="empresaNombre" type="text" formControlName="empresaNombre" placeholder="Mi Empresa S.A.S" />
+          <label for="nombre">Nombre de la empresa</label>
+          <input id="nombre" type="text" formControlName="nombre" placeholder="Mi Empresa S.A.S" />
 
           <label for="nit">NIT</label>
-          <input id="nit" type="text" formControlName="nit" placeholder="900123456-7" />
+          <input id="nit" type="text" formControlName="nit" placeholder="900123456-5" />
 
           <label for="correoContacto">Correo de contacto</label>
           <input id="correoContacto" type="email" formControlName="correoContacto" placeholder="contacto@empresa.com" />
         </ng-container>
+
 
         <button class="btn-primary" type="submit" [disabled]="loading || form.invalid">
           {{ loading ? 'Creando...' : 'Registrarme' }}
