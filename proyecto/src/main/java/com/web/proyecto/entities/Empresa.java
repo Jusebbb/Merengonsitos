@@ -29,6 +29,9 @@ public class Empresa {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(nullable = false)
+    private String password;  // Campo para la contraseña de la empresa
+
     // Relación con usuarios (como ya la tenías)
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Usuario> usuarios = new ArrayList<>();

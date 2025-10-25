@@ -20,7 +20,6 @@ public class EmpresaController {
 
     private final EmpresaService empresaService;
 
-    // CREATE (HU-01) -> crea empresa y admin inicial; devuelve 201 + Location
     @PostMapping
     public ResponseEntity<EmpresaDTO> create(@RequestBody @Valid EmpresaDTO dto) {
         EmpresaDTO created = empresaService.create(dto);
@@ -29,7 +28,6 @@ public class EmpresaController {
                 .body(created);
     }
 
-    // LIST (solo activas, por soft-delete en service)
     @GetMapping
     public ResponseEntity<List<EmpresaDTO>> list() {
         return ResponseEntity.ok(empresaService.list());
