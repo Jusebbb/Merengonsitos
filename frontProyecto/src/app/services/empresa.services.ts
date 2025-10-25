@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { EmpresaDTO } from '../models/empresa.dto';
 import { Observable } from 'rxjs';
+import { EmpresaDTO } from '../dtos/empresa.dto';
 import { environment } from '../../environments/environment';
-
 
 @Injectable({ providedIn: 'root' })
 export class EmpresaService {
-  private base = `${environment.apiBase}/empresas`;
+  private base = `${environment.apiBase}/empresas`; // /api en dev (proxy)
 
   constructor(private http: HttpClient) {}
 
