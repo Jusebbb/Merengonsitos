@@ -141,23 +141,34 @@ export class RegisterComponent {
       });
     } else {
       
+            // RegisterComponent (rama administrador)
       const payloadEmpresa = {
         nombre: this.c['nombre'].value,
         nit: this.c['nit'].value,
         correoContacto: this.c['correoContacto'].value,
       };
 
-      this.http.post(`${this.API}/empresas`, payloadEmpresa).subscribe({
-        next: () => {
-          this.loading = false;
-          this.router.navigateByUrl('/inicio-admin');
-        },
-        error: (e) => {
-          this.loading = false;
-          console.error('Error al crear empresa', e);
-          alert(e?.error?.message || 'No se pudo crear la empresa');
-        },
-      });
+      this.http.post(`${this.API}/empresas`, payloadEmpresa, { observe: 'response', responseType: 'json' })
+        .subscribe({
+          next: (res) => {
+            console.log('OK /empresas =>', res.status, res.body);
+            this.loading = false;
+            this.router.navigateByUrl('/inicio-admin');
+          },
+          error: (e) => {
+            this.loading = false;
+            console.error('ERR /empresas =>', e);
+            const msg =
+              e?.error?.message ||
+              e?.error?.error ||
+              (typeof e?.error === 'string' && e.error) ||
+              (e?.error?.errors && Object.values(e.error.errors).flat().join('\n')) ||
+              (e?.status ? `HTTP ${e.status}` : '') ||
+              'No se pudo crear la empresa';
+            alert(msg);
+          }
+        });
+
     }
   }
 }

@@ -10,7 +10,7 @@ export class EmpresaService {
 
   constructor(private http: HttpClient) {}
 
-  crear(dto: Omit<EmpresaDTO, 'id'>): Observable<EmpresaDTO> {
-    return this.http.post<EmpresaDTO>(this.base, dto);
-  }
+  crear(dto: Omit<EmpresaDTO, 'id'>) {
+  return this.http.post<EmpresaDTO>(this.base, dto, { observe: 'response' });
+}
 }
