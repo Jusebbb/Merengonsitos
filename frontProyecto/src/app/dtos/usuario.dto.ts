@@ -5,3 +5,5 @@ export interface UsuarioDTO {
   password: string;
   empresaId: number;
 }
+
+export type CrearUsuarioRequest = Omit<UsuarioDTO, 'id'>;

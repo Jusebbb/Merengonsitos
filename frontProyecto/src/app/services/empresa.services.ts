@@ -1,16 +1,20 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { EmpresaDTO } from '../dtos/empresa.dto';
 import { environment } from '../../environments/environment';
+import { CrearEmpresaRequest, CrearEmpresaResponse } from '../dtos/registroDto';
 
 @Injectable({ providedIn: 'root' })
-export class EmpresaService {
-  private base = `${environment.apiBase}/empresas`; // /api en dev (proxy)
+export class EmpresaServices {
+  private http = inject(HttpClient);
+  private base = `${environment.apiBase}/empresas`; // => /api/empresas (lo resuelve el proxy)
 
-  constructor(private http: HttpClient) {}
-
-  crear(dto: Omit<EmpresaDTO, 'id'>): Observable<EmpresaDTO> {
-    return this.http.post<EmpresaDTO>(this.base, dto);
+  crearConAdmin(req: CrearEmpresaRequest): Observable<CrearEmpresaResponse> {
+    const empresaPayload = {
+      nombre: req.nombreEmpresa,
+      nit: req.nit,
+      correoContacto: req.correoEmpresa
+    };
+    return this.http.post<CrearEmpresaResponse>(this.base, empresaPayload);
   }
 }

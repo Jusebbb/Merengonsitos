@@ -1,4 +1,5 @@
+// src/environments/environment.ts
 export const environment = {
   production: false,
-  apiBase: '/api'
+  apiBase: 'http://127.0.0.1:8080/api'
 };
