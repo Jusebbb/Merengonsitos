@@ -4,9 +4,7 @@ import {
   FormBuilder, Validators, ReactiveFormsModule, FormGroup, AbstractControl, ValidationErrors
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
-import { EmpresaService } from '../../services/empresa.services';
-import { UsuarioService } from '../../services/usuario.services';
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 
 type Rol = 'empleado' | 'administrador';
 
@@ -28,16 +26,17 @@ export class RegisterComponent {
   form!: FormGroup;
   loading = false;
 
+  private API = '/api';
+
   constructor(
     private fb: FormBuilder,
-    private empresaSrv: EmpresaService,
-    private usuarioSrv: UsuarioService,
+    private http: HttpClient,
     private router: Router
   ) {
     this.form = this.fb.group({
       role: ['administrador' as Rol, [Validators.required]],
 
-      // EMPLEADO
+      // EMPLEADO (pendiente)
       userNombre: [''],
       email: [''],
       password: [''],
@@ -49,16 +48,14 @@ export class RegisterComponent {
       nit: ['', [Validators.required]],
       correoContacto: ['', [Validators.required, Validators.email]],
 
-      // Campo visual (solo UI, NO se envía)
+      // Campo visual de contraseña (no se envía)
       empresaPassword: [''],
     });
 
+    // Validaciones dinámicas si cambian de rol
     this.form.get('role')!.valueChanges.subscribe((role: Rol) => {
       this.applyValidators(role);
     });
-
-    // aplica validación inicial para el rol por defecto
-    this.applyValidators(this.form.get('role')!.value as Rol);
   }
 
   get c() { return this.form.controls; }
@@ -78,11 +75,10 @@ export class RegisterComponent {
       this.form.get(name)!.updateValueAndValidity({ emitEvent: false });
     };
 
-    // Limpia validador de grupo
+    // Limpia validadores del form group
     this.form.clearValidators();
 
     if (role === 'empleado') {
-      // Validaciones PARA EMPLEADO
       set('userNombre', [Validators.required, Validators.minLength(2)]);
       set('email', [Validators.required, Validators.email]);
       set('password', [Validators.required, Validators.minLength(6)]);
@@ -90,16 +86,13 @@ export class RegisterComponent {
       set('empresaId', [Validators.required, Validators.min(1)]);
       this.form.setValidators(samePasswordGroup);
 
-      // Limpia empresa
       clear(['nombre', 'nit', 'correoContacto']);
-
     } else {
-      // Validaciones PARA ADMIN (empresa)
+      // ADMIN → solo empresa (EmpresaDTO: nombre, nit, correoContacto)
       set('nombre', [Validators.required, Validators.minLength(2)]);
       set('nit', [Validators.required]);
       set('correoContacto', [Validators.required, Validators.email]);
 
-      // Limpia empleado
       clear(['userNombre', 'email', 'password', 'confirm', 'empresaId']);
     }
 
@@ -108,57 +101,57 @@ export class RegisterComponent {
 
   onSubmit() {
     const role = this.c['role'].value as Rol;
+    console.log('[REGISTER] submit role=', role, 'valid=', this.form.valid, 'value=', this.form.value);
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      if (role === 'empleado' && this.form.errors?.['passwordMismatch']) {
-        // mantén el mensaje visual en el template si lo deseas
-      }
+      console.log('[REGISTER] form INVALID');
       return;
     }
 
     this.loading = true;
 
-    if (role === 'empleado') {
-      // === Crear USUARIO (empleado) ===
-      const payload = {
-        nombre: String(this.c['userNombre'].value || '').trim(),
-        email: String(this.c['email'].value || '').trim(),
-        password: String(this.c['password'].value || '').trim(),
-        empresaId: Number(this.c['empresaId'].value),
-      };
-
-      this.usuarioSrv.crear(payload).subscribe({
-        next: () => {
-          this.loading = false;
-          this.router.navigateByUrl('/inicio-usuario');
-        },
-        error: (e) => {
-          this.loading = false;
-          console.error('Error al crear usuario', e);
-          alert(e?.error?.message || `HTTP ${e?.status}` || 'No se pudo crear el usuario');
-        },
-      });
-
-    } else {
-      // === Crear EMPRESA (administrador) ===
+    if (role === 'administrador') {
+      // SOLO crear la EMPRESA
       const payloadEmpresa = {
         nombre: String(this.c['nombre'].value || '').trim(),
         nit: String(this.c['nit'].value || '').trim(),
         correoContacto: String(this.c['correoContacto'].value || '').trim(),
       };
 
-      this.empresaSrv.crear(payloadEmpresa).subscribe({
-        next: () => {
+      console.log('POST /api/empresas =>', payloadEmpresa);
+
+      const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+      this.http.post(`${this.API}/empresas`, payloadEmpresa, {
+        headers,
+        observe: 'response',
+        responseType: 'json'
+      }).subscribe({
+        next: (res) => {
+          console.log('OK /api/empresas =>', res.status, res.body);
           this.loading = false;
           this.router.navigateByUrl('/inicio-admin');
         },
         error: (e) => {
           this.loading = false;
-          console.error('Error al crear empresa', e);
-          alert(e?.error?.message || `HTTP ${e?.status}` || 'No se pudo crear la empresa');
-        },
+          // Muestra el error real del backend
+          console.error('ERR /api/empresas =>', e);
+          console.log('ERR body =>', e?.error);
+          const msg =
+            e?.error?.message ||
+            e?.error?.error ||
+            (typeof e?.error === 'string' && e.error) ||
+            (e?.error?.errors && Object.values(e.error.errors).flat().join('\n')) ||
+            (e?.status ? `HTTP ${e.status}` : '') ||
+            'No se pudo crear la empresa';
+          alert(msg);
+        }
       });
+
+    } else {
+      this.loading = false;
+      alert('Modo EMPLEADO pendiente de implementar.');
     }
   }
 }
