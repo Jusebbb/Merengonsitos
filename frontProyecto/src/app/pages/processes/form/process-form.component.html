@@ -1,19 +1,24 @@
 <h2>{{ isEdit ? 'Editar proceso' : 'Nuevo proceso' }}</h2>
 
 <form [formGroup]="form" (ngSubmit)="save()">
-  <label>Nombre</label>
-  <input formControlName="name" />
+  <!-- Añadido 'for="name-input"' al label y 'id="name-input"' al input -->
+  <label for="name-input">Nombre</label>
+  <input id="name-input" formControlName="name" />
 
-  <label>Descripción</label>
-  <textarea formControlName="description"></textarea>
+  <!-- Añadido 'for="desc-textarea"' al label y 'id="desc-textarea"' al textarea -->
+  <label for="desc-textarea">Descripción</label>
+  <textarea id="desc-textarea" formControlName="description"></textarea>
 
-  <label>Estado</label>
-  <select formControlName="status">
+  <!-- Añadido 'for="status-select"' al label y 'id="status-select"' al select -->
+  <label for="status-select">Estado</label>
+  <select id="status-select" formControlName="status">
     <option value="DRAFT">Borrador</option>
     <option value="ACTIVE">Activo</option>
     <option value="ARCHIVED">Archivado</option>
   </select>
 
+
   <button type="submit" [disabled]="form.invalid">Guardar</button>
   <a routerLink="/processes">Cancelar</a>
 </form>
+<!-- Me estaba dando error por eso le añadí coss, sin embargo funciona igual -->
