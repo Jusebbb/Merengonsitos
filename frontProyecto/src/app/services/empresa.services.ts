@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { CrearEmpresaRequest, CrearEmpresaResponse } from '../dtos/registroDto';
 
 @Injectable({ providedIn: 'root' })
-export class EmpresaService {
+export class EmpresaServices {
   private http = inject(HttpClient);
   private base = `${environment.apiBase}/empresas`; // => /api/empresas (lo resuelve el proxy)
 
