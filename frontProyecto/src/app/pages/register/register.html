@@ -49,9 +49,10 @@
             {{ c['correoContacto'].errors?.['required'] ? 'Requerido' : 'Correo inválido' }}
           </small>
 
-          <!-- Campo de contraseña VISUAL (no se envía al back porque EmpresaDTO no lo tiene) -->
-          <label for="empresaPassword">Contraseña (solo visible, no se envía)</label>
+          <label for="empresaPassword">Contraseña</label>
           <input id="empresaPassword" type="password" formControlName="empresaPassword" placeholder="••••••••" />
+          <small *ngIf="c['empresaPassword'].touched && c['empresaPassword'].invalid">Requerido</small>
+
         </ng-container>
 
         <!-- ========= EMPLEADO (pendiente) ========= -->

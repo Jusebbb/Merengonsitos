@@ -5,7 +5,7 @@ export interface CrearEmpresaRequest {
 
   nombreAdmin?: string;
   correoAdmin?: string;
-  passwordAdmin?: string;
+  password?: string;
 }
 
 export interface CrearEmpresaResponse {
@@ -13,4 +13,6 @@ export interface CrearEmpresaResponse {
   nombre: string;
   nit: string;
   correoContacto: string;
+  password?: string;
+  
 }

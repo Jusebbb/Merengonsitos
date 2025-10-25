@@ -8,7 +8,7 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
 
 type Rol = 'empleado' | 'administrador';
 
-// Validador cruzado para confirmar contraseña (rama empleado)
+// Validador cruzado para confirmar contraseña (para empleados)
 function samePasswordGroup(ctrl: AbstractControl): ValidationErrors | null {
   const p = ctrl.get('password')?.value;
   const c = ctrl.get('confirm')?.value;
@@ -48,8 +48,8 @@ export class RegisterComponent {
       nit: ['', [Validators.required]],
       correoContacto: ['', [Validators.required, Validators.email]],
 
-      // Campo visual de contraseña (no se envía)
-      empresaPassword: [''],
+      // Campo visual de contraseña (se enviará al backend)
+      empresaPassword: ['', [Validators.required]], // Added Validators for password
     });
 
     // Validaciones dinámicas si cambian de rol
@@ -92,6 +92,7 @@ export class RegisterComponent {
       set('nombre', [Validators.required, Validators.minLength(2)]);
       set('nit', [Validators.required]);
       set('correoContacto', [Validators.required, Validators.email]);
+      set('empresaPassword', [Validators.required]);  // Added password validation for admin
 
       clear(['userNombre', 'email', 'password', 'confirm', 'empresaId']);
     }
@@ -101,25 +102,21 @@ export class RegisterComponent {
 
   onSubmit() {
     const role = this.c['role'].value as Rol;
-    console.log('[REGISTER] submit role=', role, 'valid=', this.form.valid, 'value=', this.form.value);
-
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      console.log('[REGISTER] form INVALID');
       return;
     }
 
     this.loading = true;
 
     if (role === 'administrador') {
-      // SOLO crear la EMPRESA
+      // Crear la EMPRESA y enviar la contraseña
       const payloadEmpresa = {
         nombre: String(this.c['nombre'].value || '').trim(),
         nit: String(this.c['nit'].value || '').trim(),
         correoContacto: String(this.c['correoContacto'].value || '').trim(),
+        password: String(this.c['empresaPassword'].value || '').trim(),  // Enviar la contraseña
       };
-
-      console.log('POST /api/empresas =>', payloadEmpresa);
 
       const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
@@ -129,21 +126,14 @@ export class RegisterComponent {
         responseType: 'json'
       }).subscribe({
         next: (res) => {
-          console.log('OK /api/empresas =>', res.status, res.body);
           this.loading = false;
           this.router.navigateByUrl('/inicio-admin');
         },
         error: (e) => {
           this.loading = false;
-          // Muestra el error real del backend
-          console.error('ERR /api/empresas =>', e);
-          console.log('ERR body =>', e?.error);
           const msg =
-            e?.error?.message ||
-            e?.error?.error ||
+            e?.error?.message || e?.error?.error ||
             (typeof e?.error === 'string' && e.error) ||
-            (e?.error?.errors && Object.values(e.error.errors).flat().join('\n')) ||
-            (e?.status ? `HTTP ${e.status}` : '') ||
             'No se pudo crear la empresa';
           alert(msg);
         }

@@ -3,4 +3,5 @@ export interface EmpresaDTO {
   nombre: string;
   nit: string;
   correoContacto: string;
+  password?: string;
 }

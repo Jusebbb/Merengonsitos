@@ -9,12 +9,13 @@ export class EmpresaServices {
   private http = inject(HttpClient);
   private base = `${environment.apiBase}/empresas`; // => /api/empresas (lo resuelve el proxy)
 
-  crearConAdmin(req: CrearEmpresaRequest): Observable<CrearEmpresaResponse> {
-    const empresaPayload = {
-      nombre: req.nombreEmpresa,
-      nit: req.nit,
-      correoContacto: req.correoEmpresa
-    };
-    return this.http.post<CrearEmpresaResponse>(this.base, empresaPayload);
-  }
+ crearConAdmin(req: CrearEmpresaRequest): Observable<CrearEmpresaResponse> {
+  const empresaPayload = {
+    nombre: req.nombreEmpresa,
+    nit: req.nit,
+    correoContacto: req.correoEmpresa,
+    password: req.password  // Se envía la contraseña desde el frontend
+  };
+  return this.http.post<CrearEmpresaResponse>(this.base, empresaPayload);
+}
 }
