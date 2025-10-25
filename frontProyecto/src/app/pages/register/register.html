@@ -17,24 +17,44 @@
       <h2>Crear cuenta</h2>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
+
         <!-- Selector de rol -->
         <label>Tipo de usuario</label>
         <div class="seg-group" role="group" aria-label="Tipo de usuario">
-          <button type="button"
-                  class="seg-btn"
+          <button type="button" class="seg-btn"
                   [class.active]="c['role'].value === 'empleado'"
                   (click)="setRole('empleado')">
             Empleado
           </button>
-          <button type="button"
-                  class="seg-btn"
+          <button type="button" class="seg-btn"
                   [class.active]="c['role'].value === 'administrador'"
                   (click)="setRole('administrador')">
             Administrador
           </button>
         </div>
 
-        <!-- FORM EMPLEADO -->
+        <!-- ========= ADMINISTRADOR: SOLO EMPRESA ========= -->
+        <ng-container *ngIf="c['role'].value === 'administrador'">
+          <label for="empresaNombre">Nombre de la empresa</label>
+          <input id="empresaNombre" type="text" formControlName="nombre" placeholder="Mi Empresa S.A.S" />
+          <small *ngIf="c['nombre'].touched && c['nombre'].invalid">Requerido (mín. 2 caracteres)</small>
+
+          <label for="nit">NIT</label>
+          <input id="nit" type="text" formControlName="nit" placeholder="900123456-5" />
+          <small *ngIf="c['nit'].touched && c['nit'].invalid">Requerido</small>
+
+          <label for="correoContacto">Correo de contacto</label>
+          <input id="correoContacto" type="email" formControlName="correoContacto" placeholder="contacto@empresa.com" />
+          <small *ngIf="c['correoContacto'].touched && c['correoContacto'].invalid">
+            {{ c['correoContacto'].errors?.['required'] ? 'Requerido' : 'Correo inválido' }}
+          </small>
+
+          <!-- Campo de contraseña VISUAL (no se envía al back porque EmpresaDTO no lo tiene) -->
+          <label for="empresaPassword">Contraseña (solo visible, no se envía)</label>
+          <input id="empresaPassword" type="password" formControlName="empresaPassword" placeholder="••••••••" />
+        </ng-container>
+
+        <!-- ========= EMPLEADO (pendiente) ========= -->
         <ng-container *ngIf="c['role'].value === 'empleado'">
           <label for="userNombre">Nombre</label>
           <input id="userNombre" type="text" formControlName="userNombre" placeholder="Tu nombre" />
@@ -52,19 +72,7 @@
           <input id="empresaId" type="number" formControlName="empresaId" placeholder="Ej: 3" />
         </ng-container>
 
-        <ng-container *ngIf="c['role'].value === 'administrador'">
-          <label for="nombre">Nombre de la empresa</label>
-          <input id="nombre" type="text" formControlName="nombre" placeholder="Mi Empresa S.A.S" />
-
-          <label for="nit">NIT</label>
-          <input id="nit" type="text" formControlName="nit" placeholder="900123456-5" />
-
-          <label for="correoContacto">Correo de contacto</label>
-          <input id="correoContacto" type="email" formControlName="correoContacto" placeholder="contacto@empresa.com" />
-        </ng-container>
-
-
-        <button class="btn-primary" type="submit" [disabled]="loading || form.invalid">
+        <button class="btn-primary" type="submit" [disabled]="loading">
           {{ loading ? 'Creando...' : 'Registrarme' }}
         </button>
       </form>
