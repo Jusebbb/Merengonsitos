@@ -3,6 +3,7 @@ package com.web.proyecto.services;
 import com.web.proyecto.dtos.UsuarioDTO;
 import com.web.proyecto.entities.Empresa;
 import com.web.proyecto.entities.Usuario;
+import com.web.proyecto.entities.RolUsuario;
 import com.web.proyecto.repositories.EmpresaRepository;
 import com.web.proyecto.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class UsuarioService {
                 .email(u.getEmail())
                 .password(u.getPassword())
                 .empresaId(u.getEmpresa().getId())
+                .rol(u.getRol()) // Asegurando que el rol se pase correctamente
                 .build();
     }
 
@@ -38,6 +40,7 @@ public class UsuarioService {
                 .nombre(dto.getNombre())
                 .email(dto.getEmail())
                 .password(dto.getPassword())
+                .rol(dto.getRol()) // Asegurando que el rol se mapee
                 .empresa(empresa)
                 .build();
     }
@@ -61,8 +64,7 @@ public class UsuarioService {
         u.setNombre(dto.getNombre());
         u.setEmail(dto.getEmail());
         u.setPassword(dto.getPassword());
-        u.setEmpresa(empresaRepo.findById(dto.getEmpresaId())
-                .orElseThrow(() -> new IllegalArgumentException("Empresa no encontrada: " + dto.getEmpresaId())));
+        u.setRol(dto.getRol() != null ? dto.getRol() : RolUsuario.LECTOR);  // Si el rol no se pasa, asignar LECTOR
 
         return toDTO(usuarioRepo.save(u));
     }
@@ -84,4 +86,13 @@ public class UsuarioService {
         }
         usuarioRepo.deleteById(id);
     }
+
+    public UsuarioDTO updateRol(Long id, RolUsuario rol) {
+    Usuario u = usuarioRepo.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + id));
+
+    u.setRol(rol);  // Actualiza el rol del usuario
+    return toDTO(usuarioRepo.save(u)); // Guarda y retorna el DTO actualizado
+}
+
 }

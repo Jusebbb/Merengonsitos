@@ -23,8 +23,9 @@ public class Usuario {
     @Column(nullable = false, length = 120)
     private String password;
     
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String rol;
+    private RolUsuario rol;
 
 
     // Relación con Empresa

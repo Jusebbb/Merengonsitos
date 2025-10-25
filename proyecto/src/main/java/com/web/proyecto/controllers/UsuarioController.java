@@ -1,6 +1,7 @@
 package com.web.proyecto.controllers;
 
 import com.web.proyecto.dtos.UsuarioDTO;
+import com.web.proyecto.entities.RolUsuario;
 import com.web.proyecto.services.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +43,12 @@ public class UsuarioController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Endpoint para actualizar solo el rol
+    @PatchMapping("/{id}/rol")
+    public ResponseEntity<UsuarioDTO> cambiarRol(@PathVariable Long id, @RequestBody RolUsuario rol) {
+        UsuarioDTO updated = service.updateRol(id, rol);
+        return ResponseEntity.ok(updated);
     }
 }

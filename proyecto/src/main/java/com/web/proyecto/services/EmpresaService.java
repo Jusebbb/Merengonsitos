@@ -3,6 +3,7 @@ package com.web.proyecto.services;
 import com.web.proyecto.dtos.EmpresaDTO;
 import com.web.proyecto.entities.Empresa;
 import com.web.proyecto.entities.Rol;
+import com.web.proyecto.entities.RolUsuario;
 import com.web.proyecto.entities.Usuario;
 import com.web.proyecto.repositories.EmpresaRepository;
 import com.web.proyecto.repositories.UsuarioRepository;
@@ -66,7 +67,7 @@ public class EmpresaService {
         admin.setNombre("Administrador " + dto.getNombre());  // ✅ campo obligatorio
         admin.setEmail(dto.getCorreoContacto());
         admin.setPassword(passwordEncoder.encode("ChangeMe123!"));
-        admin.setRol("ADMIN");   // como String
+        admin.setRol(RolUsuario.ADMIN); 
         admin.setEmpresa(e);
 
         usuarioRepository.save(admin);
