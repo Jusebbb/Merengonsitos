@@ -1,21 +1,17 @@
+<!-- src/app/pages/inicio-admin/inicio-admin.html -->
 <div class="main-container">
-  <!-- Contenedor para la imagen y la pregunta -->
   <div class="welcome-box">
-    <!-- Contenedor de la imagen -->
     <div class="welcome-image-container">
       <img src="/assets/imagen-de-bienvenida.png" alt="Imagen de bienvenida" class="welcome-image"/>
     </div>
-    
-    <!-- Pregunta en azul -->
     <p class="greeting">¿Qué quieres hacer hoy?</p>
   </div>
 
-  <!-- Contenedor para los botones en dos columnas -->
   <div class="buttons-box">
     <div class="actions-container">
       <div class="button-column">
-        <!-- Modificado con routerLink para redirigir al formulario de usuario -->
-        <button class="btn-option" routerLink="/crear-usuario">Crear un Usuario</button>
+        <!-- Igual que en register: routerLink absoluto -->
+        <button class="btn-option" [routerLink]="['/crear-usuario']">Crear un Usuario</button>
         <button class="btn-option">Usuarios</button>
         <button class="btn-option">Procesos</button>
       </div>
