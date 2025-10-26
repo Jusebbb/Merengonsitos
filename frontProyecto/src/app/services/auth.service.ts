@@ -1,22 +1,21 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { LoginRequest, LoginResponse, RolUsuario } from '../dtos/loginDto';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Ajusta a tu endpoint real:
-  private API = '/api/auth';
+  private readonly API = environment.apiBase; // ej: http://localhost:8080/api
 
   constructor(private http: HttpClient) {}
 
   login(body: LoginRequest): Observable<LoginResponse> {
+    // POST http://localhost:8080/api/login
     return this.http.post<LoginResponse>(`${this.API}/login`, body).pipe(
-      tap(res => {
-        // Normalizamos el nombre del campo por si llega como "rol" o "role"
-        const rawRole = (res.role ?? res.rol ?? '').toString().toUpperCase();
-        const role = (['ADMIN', 'EDITOR', 'LECTOR'].includes(rawRole) ? rawRole : 'LECTOR') as RolUsuario;
+      tap((res) => {
+        const raw = (res.role ?? res.rol ?? '').toString().toUpperCase();
+        const role: RolUsuario = raw === 'ADMIN' ? 'ADMIN' : (raw === 'EDITOR' ? 'EDITOR' : 'LECTOR');
 
         localStorage.setItem('token', res.token);
         localStorage.setItem('role', role);
@@ -38,11 +37,6 @@ export class AuthService {
     return (v === 'ADMIN' || v === 'EDITOR' || v === 'LECTOR') ? (v as RolUsuario) : null;
   }
 
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem('token');
-  }
+  isLoggedIn(): boolean { return !!localStorage.getItem('token'); }
+  getToken(): string | null { return localStorage.getItem('token'); }
 }
