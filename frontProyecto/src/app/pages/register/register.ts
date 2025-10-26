@@ -25,7 +25,6 @@ function samePasswordGroup(ctrl: AbstractControl): ValidationErrors | null {
 export class RegisterComponent {
   form!: FormGroup;
   loading = false;
-
   private API = '/api';
 
   constructor(
@@ -33,23 +32,21 @@ export class RegisterComponent {
     private http: HttpClient,
     private router: Router
   ) {
+    // Definición del formulario con sus validaciones
     this.form = this.fb.group({
       role: ['administrador' as Rol, [Validators.required]],
 
-      // EMPLEADO (pendiente)
       userNombre: [''],
       email: [''],
       password: [''],
-      confirm: [''],
       empresaId: [null],
+      rol: ['LECTOR', [Validators.required]], // Aquí se define el rol para los empleados
 
       // EMPRESA (ADMIN)
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       nit: ['', [Validators.required]],
       correoContacto: ['', [Validators.required, Validators.email]],
-
-      // Campo visual de contraseña (se enviará al backend)
-      empresaPassword: ['', [Validators.required]], // Added Validators for password
+      empresaPassword: ['', [Validators.required]],
     });
 
     // Validaciones dinámicas si cambian de rol
@@ -75,24 +72,20 @@ export class RegisterComponent {
       this.form.get(name)!.updateValueAndValidity({ emitEvent: false });
     };
 
-    // Limpia validadores del form group
     this.form.clearValidators();
 
     if (role === 'empleado') {
       set('userNombre', [Validators.required, Validators.minLength(2)]);
       set('email', [Validators.required, Validators.email]);
       set('password', [Validators.required, Validators.minLength(6)]);
-      set('confirm', [Validators.required, Validators.minLength(6)]);
       set('empresaId', [Validators.required, Validators.min(1)]);
-      this.form.setValidators(samePasswordGroup);
-
-      clear(['nombre', 'nit', 'correoContacto']);
+      // Quitar confirmación de contraseña
+      clear(['confirm']);
     } else {
-      // ADMIN → solo empresa (EmpresaDTO: nombre, nit, correoContacto)
       set('nombre', [Validators.required, Validators.minLength(2)]);
       set('nit', [Validators.required]);
       set('correoContacto', [Validators.required, Validators.email]);
-      set('empresaPassword', [Validators.required]);  // Added password validation for admin
+      set('empresaPassword', [Validators.required]);
 
       clear(['userNombre', 'email', 'password', 'confirm', 'empresaId']);
     }
@@ -109,13 +102,40 @@ export class RegisterComponent {
 
     this.loading = true;
 
-    if (role === 'administrador') {
-      // Crear la EMPRESA y enviar la contraseña
+    const payload = {
+      nombre: this.c['userNombre'].value.trim(),
+      email: this.c['email'].value.trim(),
+      password: this.c['password'].value.trim(),
+      empresaId: this.c['empresaId'].value,
+      rol: this.c['rol'].value, // Se pasa el rol del empleado
+    };
+
+    // Si el rol es 'empleado', se envía al backend para crear el usuario
+    if (role === 'empleado') {
+      const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+      this.http.post(`${this.API}/usuarios`, payload, {
+        headers,
+        observe: 'response',
+        responseType: 'json'
+      }).subscribe({
+        next: (res) => {
+          console.log('Empleado creado:', res);
+          this.loading = false;
+          this.router.navigateByUrl('/inicio-usuario');  // Cambia la ruta según lo necesites
+        },
+        error: (e) => {
+          console.error('Error al crear empleado', e);
+          this.loading = false;
+          alert('No se pudo registrar el empleado. Intenta nuevamente.');
+        }
+      });
+    } else {
       const payloadEmpresa = {
         nombre: String(this.c['nombre'].value || '').trim(),
         nit: String(this.c['nit'].value || '').trim(),
         correoContacto: String(this.c['correoContacto'].value || '').trim(),
-        password: String(this.c['empresaPassword'].value || '').trim(),  // Enviar la contraseña
+        password: String(this.c['empresaPassword'].value || '').trim(),
       };
 
       const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
@@ -138,10 +158,6 @@ export class RegisterComponent {
           alert(msg);
         }
       });
-
-    } else {
-      this.loading = false;
-      alert('Modo EMPLEADO pendiente de implementar.');
     }
   }
 }

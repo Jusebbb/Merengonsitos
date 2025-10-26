@@ -1,5 +1,4 @@
 <div class="login-container">
-  <!-- IZQUIERDA -->
   <div class="login-left">
     <div class="left-content">
       <img src="/assets/loginImagenn.png" alt="Imagen decorativa" class="left-illustration" />
@@ -10,14 +9,12 @@
     </div>
   </div>
 
-  <!-- DERECHA -->
   <div class="login-right">
     <div class="login-box">
       <img src="/assets/logo.png" alt="Logo" class="logo" />
       <h2>Crear cuenta</h2>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
-
         <!-- Selector de rol -->
         <label>Tipo de usuario</label>
         <div class="seg-group" role="group" aria-label="Tipo de usuario">
@@ -33,7 +30,7 @@
           </button>
         </div>
 
-        <!-- ========= ADMINISTRADOR: SOLO EMPRESA ========= -->
+        <!-- Campos para Administrador -->
         <ng-container *ngIf="c['role'].value === 'administrador'">
           <label for="empresaNombre">Nombre de la empresa</label>
           <input id="empresaNombre" type="text" formControlName="nombre" placeholder="Mi Empresa S.A.S" />
@@ -45,17 +42,14 @@
 
           <label for="correoContacto">Correo de contacto</label>
           <input id="correoContacto" type="email" formControlName="correoContacto" placeholder="contacto@empresa.com" />
-          <small *ngIf="c['correoContacto'].touched && c['correoContacto'].invalid">
-            {{ c['correoContacto'].errors?.['required'] ? 'Requerido' : 'Correo inválido' }}
-          </small>
+          <small *ngIf="c['correoContacto'].touched && c['correoContacto'].invalid">Correo inválido</small>
 
           <label for="empresaPassword">Contraseña</label>
           <input id="empresaPassword" type="password" formControlName="empresaPassword" placeholder="••••••••" />
           <small *ngIf="c['empresaPassword'].touched && c['empresaPassword'].invalid">Requerido</small>
-
         </ng-container>
 
-        <!-- ========= EMPLEADO (pendiente) ========= -->
+        <!-- Campos para Empleado -->
         <ng-container *ngIf="c['role'].value === 'empleado'">
           <label for="userNombre">Nombre</label>
           <input id="userNombre" type="text" formControlName="userNombre" placeholder="Tu nombre" />
@@ -63,11 +57,15 @@
           <label for="email">Correo electrónico</label>
           <input id="email" type="email" formControlName="email" placeholder="email@dominio.com" />
 
+          <label for="rol">Rol</label>
+          <select formControlName="rol" id="rol">
+            <option value="LECTOR">Lector</option>
+            <option value="EDITOR">Editor</option>
+            <option value="ADMIN">Administrador</option>
+          </select>
+
           <label for="password">Contraseña</label>
           <input id="password" type="password" formControlName="password" placeholder="••••••••" />
-
-          <label for="confirm">Confirmar contraseña</label>
-          <input id="confirm" type="password" formControlName="confirm" placeholder="••••••••" />
 
           <label for="empresaId">ID de empresa</label>
           <input id="empresaId" type="number" formControlName="empresaId" placeholder="Ej: 3" />
