@@ -2,12 +2,14 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';  // Importa RouterModule para la navegación
+import { HttpClientModule } from '@angular/common/http';
 import { UsuarioService } from '../../../services/usuario.services';  // Asegúrate de importar tu servicio
 
 @Component({
   selector: 'app-user-form',
   standalone: true,  // Esto hace que el componente sea independiente
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, HttpClientModule],  // Importa los módulos necesarios
   templateUrl: './user-form.html',
   styleUrls: ['./user-form.scss']
 })
