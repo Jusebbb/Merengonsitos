@@ -3,10 +3,13 @@ package com.web.proyecto.controllers;
 import com.web.proyecto.dtos.LoginRequest;
 import com.web.proyecto.dtos.LoginResponse;
 import com.web.proyecto.entities.RolUsuario;
+import com.web.proyecto.entities.Usuario;
+import com.web.proyecto.repositories.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -14,9 +17,14 @@ import java.util.UUID;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private final UsuarioRepository usuarioRepository;
+
+    public AuthController(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest body) {
-        // ======= VALIDACIONES BÁSICAS =======
         if (body.getEmail() == null || body.getPassword() == null ||
             body.getEmail().isBlank() || body.getPassword().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -27,23 +35,34 @@ public class AuthController {
                     .body("Credenciales inválidas");
         }
 
-        String email = body.getEmail().toLowerCase();
-        RolUsuario role;
+        final String rawEmail = body.getEmail();
+        final String emailLower = rawEmail.toLowerCase();
 
-        if (email.contains("admin")) {
-            role = RolUsuario.ADMIN;
-        } else if (email.contains("editor")) {
-            role = RolUsuario.EDITOR;
-        } else {
-            role = RolUsuario.LECTOR;
+        // Busca el usuario por email (tal cual); si no lo encuentra, intenta con lower-case
+        Optional<Usuario> maybeUser = usuarioRepository.findByEmail(rawEmail);
+        if (maybeUser.isEmpty()) {
+            maybeUser = usuarioRepository.findByEmail(emailLower);
         }
 
-        // Genera token simple (en real usa JWT)
-        String token = UUID.randomUUID().toString();
-        String userId = UUID.nameUUIDFromBytes(email.getBytes()).toString();
-        String name = email.split("@")[0];
+        // Rol por defecto (si no hay usuario en BD)
+        RolUsuario role = emailLower.contains("admin") ? RolUsuario.ADMIN
+                : emailLower.contains("editor") ? RolUsuario.EDITOR
+                : RolUsuario.LECTOR;
 
-        LoginResponse res = new LoginResponse(token, role, userId, name);
+        Long empresaId = null;
+        if (maybeUser.isPresent()) {
+            Usuario u = maybeUser.get();
+            // Si quieres que el rol venga de BD, usa la línea de abajo:
+            if (u.getRol() != null) role = u.getRol();
+            if (u.getEmpresa() != null) empresaId = u.getEmpresa().getId();
+        }
+
+        // Token DEMO (en real usa JWT)
+        String token = UUID.randomUUID().toString();
+        String userId = UUID.nameUUIDFromBytes(emailLower.getBytes()).toString();
+        String name = emailLower.split("@")[0];
+
+        LoginResponse res = new LoginResponse(token, role, userId, name, empresaId);
         return ResponseEntity.ok(res);
     }
 }

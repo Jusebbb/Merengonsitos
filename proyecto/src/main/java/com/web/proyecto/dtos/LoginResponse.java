@@ -12,4 +12,5 @@ private String token;
     private RolUsuario role;
     private String userId;
     private String name;
+    private Long empresaId;
 }

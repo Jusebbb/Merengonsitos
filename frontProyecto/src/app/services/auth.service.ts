@@ -4,7 +4,7 @@ import { environment } from '../../environments/environment';
 import { Observable, tap, map } from 'rxjs';
 
 export interface LoginRequest { email: string; password: string; }
-export interface LoginResponse { token: string; role?: string; userId?: string; name?: string; }
+export interface LoginResponse { token: string; role?: string; userId?: string; name?: string; empresaId?: number; }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -22,6 +22,7 @@ export class AuthService {
         localStorage.setItem('role', (res.role ?? '').toUpperCase());
         localStorage.setItem('userId', res.userId ?? '');
         localStorage.setItem('name', res.name ?? '');
+        if (res.empresaId != null) localStorage.setItem('empresaId', String(res.empresaId));
       }),
       map(() => void 0)
     );

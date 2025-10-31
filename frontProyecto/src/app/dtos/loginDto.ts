@@ -15,4 +15,5 @@ export interface LoginResponse {
   rol?: RolUsuario | string;
   userId?: string;
   name?: string;
+  empresaId?: number;
 }

@@ -2,47 +2,78 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';  // Importa RouterModule para la navegación
-import { HttpClientModule } from '@angular/common/http';
-import { UsuarioService } from '../../../services/usuario.services';  // Asegúrate de importar tu servicio
+import { RouterModule, Router } from '@angular/router';
+import { UsuarioService } from '../../../services/usuario.services';
 
 @Component({
   selector: 'app-user-form',
-  standalone: true,  // Esto hace que el componente sea independiente
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, HttpClientModule],  // Importa los módulos necesarios
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './user-form.html',
   styleUrls: ['./user-form.scss']
 })
 export class UserFormComponent {
   userForm!: FormGroup;
+  loading = false;
+  okMsg = '';
+  errorMsg = '';
 
-  constructor(private fb: FormBuilder, private usuarioService: UsuarioService) { }
+  constructor(
+    private fb: FormBuilder,
+    private usuarioService: UsuarioService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Inicializamos el formulario reactivo
     this.userForm = this.fb.group({
       nombre: ['', Validators.required],
-      correo: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      rol: ['', Validators.required]
+      rol: ['LECTOR', Validators.required] // enum en MAYÚSCULAS
     });
   }
 
-  // Función para manejar el envío del formulario
   onSubmit() {
+    this.okMsg = '';
+    this.errorMsg = '';
+
     if (this.userForm.invalid) {
+      this.userForm.markAllAsTouched();
       return;
     }
 
-    const usuario = this.userForm.value;
-    this.usuarioService.createUser(usuario).subscribe(
-      response => {
-        // Redirigir o mostrar un mensaje de éxito
-        console.log('Usuario creado:', response);
+    const empresaId = Number(localStorage.getItem('empresaId')); // viene del login
+    if (!empresaId) {
+      this.errorMsg = 'No se encontró la empresa asociada al usuario actual.';
+      return;
+    }
+
+    this.loading = true;
+
+    const raw = this.userForm.getRawValue();
+    const dto = {
+      ...raw,
+      rol: String(raw.rol).toUpperCase(), // asegurar mayúsculas
+      empresaId
+    };
+
+    this.usuarioService.createUser(dto as any).subscribe({
+      next: (res) => {
+        this.loading = false;
+        this.okMsg = `Usuario creado (id ${res.id}).`;
+        this.userForm.reset({ rol: 'LECTOR' });
+        // Si prefieres redirigir automáticamente, descomenta:
+        // this.router.navigate(['/inicio-admin']);
       },
-      error => {
-        console.error('Error al crear el usuario:', error);
+      error: (err) => {
+        this.loading = false;
+        this.errorMsg = err?.error?.message || 'No se pudo crear el usuario.';
       }
-    );
+    });
+  }
+
+  // Botón "Volver al inicio"
+  goInicioAdmin() {
+    this.router.navigate(['/inicio-admin']);
   }
 }
