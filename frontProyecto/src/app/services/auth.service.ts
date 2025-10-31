@@ -9,11 +9,15 @@ export interface LoginResponse { token: string; role?: string; userId?: string; 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private API = `${environment.apiBase}/auth`;
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    console.log('[AuthService] API =', this.API);
+  }
 
   login(body: LoginRequest): Observable<void> {
+    console.log('[AuthService] POST', `${this.API}/login`, body);
     return this.http.post<LoginResponse>(`${this.API}/login`, body).pipe(
       tap(res => {
+        console.log('[AuthService] response', res);
         localStorage.setItem('token', res.token);
         localStorage.setItem('role', (res.role ?? '').toUpperCase());
         localStorage.setItem('userId', res.userId ?? '');
