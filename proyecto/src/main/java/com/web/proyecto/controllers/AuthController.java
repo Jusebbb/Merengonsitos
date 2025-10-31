@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:4200") // permite al front dev
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @PostMapping("/login")
@@ -27,7 +26,6 @@ public class AuthController {
                     .body("Credenciales inválidas");
         }
 
-        // ======= LÓGICA DEMO (reemplaza por DB más adelante) =======
         String email = body.getEmail().toLowerCase();
         RolUsuario role;
 
