@@ -1,0 +1,29 @@
+<h3>{{ isEdit? 'Editar actividad': 'Nueva actividad' }}</h3>
+<form [formGroup]="form" (ngSubmit)="save()">
+
+    <label for="name-input">Nombre</label>
+    <input id="name-input" formControlName="name" />
+
+    <label for="type-select">Tipo</label>
+    <select id="type-select" formControlName="type">
+        <option value="TASK">Tarea</option>
+        <option value="EVENT">Evento</option>
+        <option value="SUBPROCESS">Subproceso</option>
+    </select>
+
+    <label for="desc-textarea">Descripción</label>
+    <textarea id="desc-textarea" formControlName="description"></textarea>
+
+    <label for="role-input">Rol responsable</label>
+    <input 
+        id="role-input" 
+        formControlName="responsibleRole" placeholder="Ej: ADMIN / USER"
+    />
+    
+    <div class="buttons">
+        <!-- Botón Guardar con validación automática -->
+        <button type="submit" [disabled]="form.invalid">Guardar</button>
+        <!-- Botón Cancelar -->
+        <a [routerLink]="['/processes', processId, 'activities']">Cancelar</a>
+    </div>
+</form>
