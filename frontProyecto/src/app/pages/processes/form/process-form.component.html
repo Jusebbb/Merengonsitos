@@ -1,0 +1,19 @@
+<h2>{{ isEdit ? 'Editar proceso' : 'Nuevo proceso' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <label>Nombre</label>
+  <input formControlName="name" />
+
+  <label>Descripción</label>
+  <textarea formControlName="description"></textarea>
+
+  <label>Estado</label>
+  <select formControlName="status">
+    <option value="DRAFT">Borrador</option>
+    <option value="ACTIVE">Activo</option>
+    <option value="ARCHIVED">Archivado</option>
+  </select>
+
+  <button type="submit" [disabled]="form.invalid">Guardar</button>
+  <a routerLink="/processes">Cancelar</a>
+</form>

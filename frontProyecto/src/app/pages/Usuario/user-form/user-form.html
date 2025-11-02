@@ -1,0 +1,30 @@
+<div class="user-form-container">
+  <h2>Crear Usuario</h2>
+
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <label for="nombre">Nombre</label>
+    <input id="nombre" formControlName="nombre" placeholder="Nombre completo"/>
+
+    <label for="email">Correo electrónico</label>
+    <input id="email" type="email" formControlName="email" placeholder="correo@dominio.com"/>
+
+    <label for="password">Contraseña</label>
+    <input id="password" type="password" formControlName="password" placeholder="••••••••"/>
+
+    <label for="rol">Rol</label>
+    <select id="rol" formControlName="rol">
+      <option value="ADMIN">Administrador</option>
+      <option value="EDITOR">Editor</option>
+      <option value="LECTOR">Lector</option>
+    </select>
+
+    <button type="submit" [disabled]="userForm.invalid || loading">
+      {{ loading ? 'Creando…' : 'Crear Usuario' }}
+    </button>
+  </form>
+
+  <div *ngIf="okMsg" class="ok">{{ okMsg }}</div>
+  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+
+  <button *ngIf="okMsg" routerLink="/inicio-admin">Volver al inicio</button>
+</div>

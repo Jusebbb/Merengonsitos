@@ -1,0 +1,106 @@
+/* === TARJETA PRINCIPAL (UNA SOLA PIEZA CON SOMBRA) === */
+.main-container {
+  display: flex;
+  flex-direction: column; /* Alineamos todo en columna */
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f9fc; /* Fondo suave */
+}
+
+.welcome-box {
+  width: 100%;
+  max-width: 700px;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  text-align: center;
+  margin-bottom: 30px; /* Espacio entre la imagen y los botones */
+}
+
+/* Contenedor de la imagen ajustado */
+.welcome-image-container {
+  width: 100%;
+  max-width: 100%; /* Imagen más grande */
+  margin: 0 auto;
+  margin-bottom: 20px;
+}
+
+.welcome-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* Para asegurar que la imagen cubra todo el contenedor */
+}
+
+.greeting {
+  font-size: 1.4rem;
+  color: #2a7de1; /* Azul */
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+/* Contenedor para los botones en dos columnas */
+.buttons-box {
+  width: 100%;
+  max-width: 700px;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.actions-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 30px;
+}
+
+.button-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 48%; /* Ajustamos el tamaño de cada columna */
+}
+
+.btn-option {
+  background: #2a7de1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .2s, box-shadow .2s;
+  text-align: center;
+}
+
+.btn-option:hover {
+  background: #155db2;
+  box-shadow: 0 4px 10px rgba(42, 125, 225, 0.25);
+}
+
+/* Estilo para la pregunta final */
+.question {
+  margin-top: 30px;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  .actions-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .button-column {
+    width: 100%; /* En pantallas pequeñas, cada columna toma el 100% */
+  }
+
+  .btn-option {
+    width: 100%; /* Los botones ocupan todo el ancho */
+  }
+}
