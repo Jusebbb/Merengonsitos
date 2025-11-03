@@ -14,16 +14,17 @@ export const PROCESSES_ROUTES: Routes = [
       import('./form/process-form.component')
         .then(m => m.ProcessFormComponent)
   },
-  {
-    path: ':id/edit',
-    loadComponent: () =>
-      import('./form/process-form.component')
-        .then(m => m.ProcessFormComponent)
-  },
-  {
-    path: ':id',
-    loadComponent: () =>
-      import('./view/process-view.component')
-        .then(m => m.ProcessViewComponent)
-  }
+ {
+  path: ':id',
+  loadComponent: () =>
+    import('./view/process-view.component')
+      .then(m => m.ProcessViewComponent),
+  children: [
+    {
+      path: 'activities',
+      loadChildren: () =>
+         import('../activities/activities.routes').then(m => m.ACTIVITIES_ROUTES)
+    }
+  ]
+}
 ];
