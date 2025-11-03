@@ -1,0 +1,7 @@
+
+# Maven
+proyecto/target/
+
+# Backups
+*.bak
+
