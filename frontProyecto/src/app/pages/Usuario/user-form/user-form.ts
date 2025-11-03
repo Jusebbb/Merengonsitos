@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { UsuarioService } from '../../../services/usuario.services';
+import { UsuarioService } from '../../../services/Usuario/usuario.services';
 
 @Component({
   selector: 'app-user-form',

@@ -1,106 +1,117 @@
-/* === TARJETA PRINCIPAL (UNA SOLA PIEZA CON SOMBRA) === */
-.main-container {
-  display: flex;
-  flex-direction: column; /* Alineamos todo en columna */
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f4f9fc; /* Fondo suave */
+/* RESET DURO PARA OCUPAR TODO */
+* { box-sizing: border-box; }
+html, body { width:100%; height:100%; margin:0; padding:0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; }
+
+/* FONDO */
+.screen{
+  position: fixed;         /* <-- asegura 100% de la ventana SIEMPRE */
+  inset: 0;                /* top/right/bottom/left: 0 */
+  background: linear-gradient(135deg, #b8e1f5 0%, #e9f4fc 50%, #f7fbff 100%);
 }
 
-.welcome-box {
-  width: 100%;
-  max-width: 700px;
-  padding: 24px;
-  background-color: #fff;
-  border-radius: 15px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1); /* Sombra suave */
+/* PANEL ÚNICO (como el login, pero fullscreen REAL) */
+.panel{
+  width: 100vw;
+  height: 100vh;           /* <-- ocupa todo el alto */
+  background: #fff;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr; /* imagen ligeramente protagonista */
+  overflow: hidden;        /* evita scroll interno raro */
+}
+
+/* LADOS */
+.side{
+  display: grid;
+  place-items: center;
+  padding: clamp(20px, 4vw, 36px);
+}
+
+.left{
+  background: linear-gradient(180deg, #bfe8fb 0%, #d9f1ff 100%);
+}
+
+.right{
+  background: #fff;
+  align-content: center;
+}
+
+/* CONTENIDO IZQUIERDO */
+.left-content{
   text-align: center;
-  margin-bottom: 30px; /* Espacio entre la imagen y los botones */
+  max-width: 560px;
 }
 
-/* Contenedor de la imagen ajustado */
-.welcome-image-container {
-  width: 100%;
-  max-width: 100%; /* Imagen más grande */
-  margin: 0 auto;
-  margin-bottom: 20px;
-}
-
-.welcome-image {
-  width: 100%;
+.hero{
+  width: min(640px, 80vw);
+  max-width: 520px;
   height: auto;
-  object-fit: cover; /* Para asegurar que la imagen cubra todo el contenedor */
+  object-fit: contain;
+  filter: drop-shadow(0 10px 24px rgba(15,61,99,.18));
+  margin-bottom: 16px;
 }
 
-.greeting {
-  font-size: 1.4rem;
-  color: #2a7de1; /* Azul */
-  margin-bottom: 30px;
-  font-weight: 600;
+.title{
+  margin: 6px 0 4px;
+  line-height: 1.2;
+  font-weight: 800;
+  font-size: clamp(22px, 3.4vw, 36px);
+  color: #0f3d63;
 }
 
-/* Contenedor para los botones en dos columnas */
-.buttons-box {
-  width: 100%;
-  max-width: 700px;
-  padding: 24px;
-  background-color: #fff;
-  border-radius: 15px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1); /* Sombra suave */
+.subtitle{
+  margin: 0;
+  color: #2b5876;
+  font-size: clamp(14px, 1.6vw, 16px);
+  opacity: .9;
 }
 
-.actions-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 30px;
-}
-
-.button-column {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 48%; /* Ajustamos el tamaño de cada columna */
-}
-
-.btn-option {
-  background: #2a7de1;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color .2s, box-shadow .2s;
+/* DERECHA */
+.question{
+  margin: 0 0 20px;
   text-align: center;
+  font-size: clamp(18px, 2.2vw, 24px);
+  color: #2a7de1;
+  font-weight: 800;
 }
 
-.btn-option:hover {
-  background: #155db2;
-  box-shadow: 0 4px 10px rgba(42, 125, 225, 0.25);
+.grid-actions{
+  width: min(520px, 90%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 16px;
 }
 
-/* Estilo para la pregunta final */
-.question {
-  margin-top: 30px;
-  font-size: 1.1rem;
-  color: #555;
+/* BOTONES TIPO TILE */
+.tile{
+  background: #ffffff;
+  color: #0f3d63;
+  border: 1px solid #e5eef8;
+  border-radius: 14px;
+  padding: 16px 18px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(42,125,225,.08);
+  transition: transform .15s ease, box-shadow .25s ease, background-color .2s ease, border-color .2s ease;
+}
+.tile:hover{
+  transform: translateY(-2px);
+  background: #f3f8ff;
+  border-color: #cfe0f5;
+  box-shadow: 0 12px 26px rgba(42,125,225,.16);
 }
 
-/* === RESPONSIVE === */
-@media (max-width: 900px) {
-  .actions-container {
-    flex-direction: column;
-    gap: 20px;
-  }
+/* RESPONSIVE */
+@media (max-width: 980px){
+  .panel{ grid-template-columns: 1fr; }
+  .right{ padding-top: 0; }
+  .grid-actions{ grid-template-columns: 1fr 1fr; }
+  .hero{ max-width: 420px; }
+}
 
-  .button-column {
-    width: 100%; /* En pantallas pequeñas, cada columna toma el 100% */
-  }
-
-  .btn-option {
-    width: 100%; /* Los botones ocupan todo el ancho */
-  }
+@media (max-width: 560px){
+  .grid-actions{ grid-template-columns: 1fr; }
+  .hero{ max-width: 320px; }
 }

@@ -1,25 +1,27 @@
-<!-- src/app/pages/inicio-admin/inicio-admin.html -->
-<div class="main-container">
-  <div class="welcome-box">
-    <div class="welcome-image-container">
-      <img src="/assets/imagen-de-usuario.png" alt="Imagen de bienvenida" class="welcome-image"/>
-    </div>
-    
-  </div>
-<p class="greeting">¿Qué quieres hacer hoy?</p>
+<div class="screen">
+  <div class="panel">
+    <!-- IZQUIERDA: imagen grande + texto -->
+    <section class="side left">
+      <div class="left-content">
+        <img src="/assets/imagen-de-usuario.png" alt="Bienvenido" class="hero" />
+        <h1 class="title">
+          Bienvenido al Sistema de <br />Gestión de Procesos
+        </h1>
+        <p class="subtitle">Organiza usuarios, procesos y actividades desde un solo lugar.</p>
+      </div>
+    </section>
 
-  <div class="buttons-box">
-    <div class="actions-container">
-      <div class="button-column">
-  
-        <button class="btn-option">Usuarios</button>
-        <button class="btn-option">Procesos</button>
+    <!-- DERECHA: acciones -->
+    <section class="side right">
+      <h2 class="question">¿Qué quieres hacer hoy?</h2>
+
+      <div class="grid-actions">
+        <button class="tile">Usuarios</button>
+        <button class="tile">Procesos</button>
+        <button class="tile">Actividades</button>
+        <button class="tile">Gateways</button>
+        <button class="tile">Roles</button>
       </div>
-      <div class="button-column">
-        <button class="btn-option">Actividades</button>
-        <button class="btn-option">Gateways</button>
-        <button class="btn-option">Roles</button>
-      </div>
-    </div>
+    </section>
   </div>
 </div>

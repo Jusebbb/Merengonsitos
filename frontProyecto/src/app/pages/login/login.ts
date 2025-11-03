@@ -1,72 +1,53 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { FormsModule } from '@angular/forms'; 
 import { RouterModule, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/Login/auth.service';
+import { LoginDto } from '../../dtos/loginDto';
+import { UsuarioService } from '../../services/Usuario/usuario.services';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
 })
-export class LoginComponent {
-  loading = false;
-  errorMsg = '';
-  form!: FormGroup;
+export class LoginComponent implements OnInit {
+
+  loginDto: LoginDto = new LoginDto();
 
   constructor(
-    private fb: FormBuilder,
+    private loginService: AuthService,
     private router: Router,
-    private auth: AuthService
-  ) {
-    this.form = this.fb.group({
-      // deja Validators.email si quieres; para pruebas puedes quitarlo
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
-    console.log('[LOGIN] Component ready');
-  }
+    private usuarioService: UsuarioService
+  ) {}
 
-  get f() { return this.form.controls; }
+  ngOnInit(): void {}
 
   onSubmit() {
-    console.log('[LOGIN] submit pressed');
-    this.errorMsg = '';
+    console.log('Correo:', this.loginDto.email);
+    console.log('Contraseña:', this.loginDto.password);
+    this.loginUser();
+  }
 
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      console.log('[LOGIN] form INVALID', {
-        value: this.form.value,
-        emailErrors: this.form.get('email')?.errors,
-        passwordErrors: this.form.get('password')?.errors
-      });
-      this.errorMsg = 'Por favor corrige los campos.';
-      return;
-    }
-
-    this.loading = true;
-    const { email, password } = this.form.getRawValue();
-    console.log('[LOGIN] calling API…', { email });
-
-    this.auth.login({ email: email!, password: password! }).subscribe({
-      next: () => {
-        this.loading = false;
-        console.log('[LOGIN] success');
-        const role = (localStorage.getItem('role') || '').toUpperCase();
-        console.log('[LOGIN] role from storage =', role);
-        if (role === 'ADMIN') this.router.navigate(['/inicio-admin']);
-        else this.router.navigate(['/inicio-usuario']);
+  loginUser() {
+    this.loginService.loginSolv(this.loginDto).subscribe(
+      (data) => {
+        if (data) {
+          this.navegarHomeScreen();
+        } else {
+          alert('Las credenciales no coinciden, intenta de nuevo.');
+        }
       },
-      error: (err: any) => {
-        this.loading = false;
-        console.error('[LOGIN] error', err);
-        this.errorMsg =
-          err?.error?.message ||
-          (typeof err?.error === 'string' ? err.error : '') ||
-          'No se pudo iniciar sesión. Verifica tus credenciales.';
+      (error) => {
+        console.error('Error al iniciar sesión:', error);
+        alert('Error al iniciar sesión. Revisa tus credenciales.');
       }
-    });
+    );
+  }
+
+  navegarHomeScreen() {
+    this.router.navigate(['inicio-usuario']);
   }
 }
