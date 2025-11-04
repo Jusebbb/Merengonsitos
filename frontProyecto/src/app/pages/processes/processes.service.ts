@@ -3,9 +3,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { ProcessDTO } from '../../dtos/processDto';
-import { ActivityDTO } from '../../dtos/activityDto';
 import { EdgeDTO } from '../../dtos/edgeDto';
 import { GatewayDTO } from '../../dtos/gatewayDto';
+import { activityDto } from '../../dtos/activityDto';
 
 @Injectable({ providedIn: 'root' })
 export class ProcessesService {
@@ -36,7 +36,7 @@ export class ProcessesService {
   }
 
   // Tabs
-  listActivities(processId: string) { return this.http.get<ActivityDTO[]>(`${this.base}/${processId}/activities`); }
+  listActivities(processId: string) { return this.http.get<activityDto[]>(`${this.base}/${processId}/activities`); }
   listEdges(processId: string)      { return this.http.get<EdgeDTO[]>(`${this.base}/${processId}/edges`); }
   listGateways(processId: string)   { return this.http.get<GatewayDTO[]>(`${this.base}/${processId}/gateways`); }
 }

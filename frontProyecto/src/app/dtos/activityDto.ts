@@ -1,8 +1,12 @@
-export interface ActivityDTO {
-  id: string;
-  processId: string;
-  name: string;
-  type: 'TASK' | 'EVENT' | 'SUBPROCESS';
-  description?: string;
-  responsibleRole?: string; // opcional (admin, empleado, etc.)
+export class activityDto {
+    constructor(public name?: string,
+        public type?: string,
+        public description?:string,
+        public roleId?:number,
+        public status?: string,
+        public processId?:number,
+        public x?: number,
+        public y?:number
+    ){}
+    
 }

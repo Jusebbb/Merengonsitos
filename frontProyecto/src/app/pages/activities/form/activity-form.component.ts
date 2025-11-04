@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ActivitiesService } from '../activities.service';
-import { ActivityDTO } from '../../../dtos/activityDto';
+import { activityDto } from '../../../dtos/activityDto';
 
 @Component({
   selector: 'app-activity-form',
@@ -47,7 +47,7 @@ export class ActivityFormComponent implements OnInit { // La clase implementa On
   }
 
   save() {
-    const body = this.form.value as Partial<ActivityDTO>;
+    const body = this.form.value as Partial<activityDto>;
 
     if (this.isEdit && this.activityId) {
       // HU-09: Actualizar

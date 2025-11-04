@@ -1,38 +1,70 @@
-<h3>Actividades del proceso</h3>
+<main class="page">
+  <header class="page__header">
+    <h3 class="page__title">Actividades del proceso</h3>
 
-<div class="actions">
-  <!-- Botón de nueva actividad usa la clase .btn-new -->
-  <a [routerLink]="['/processes', processId, 'activities', 'new']" class="btn-new">Nueva actividad</a>
-  <!-- Botón de volver usa la clase .btn-back -->
-  <a [routerLink]="['/processes', processId]" class="btn-back">Volver al proceso</a>
-</div>
+    <nav class="actions" aria-label="Acciones">
+      <a [routerLink]="['/processes', processId, 'activities', 'new']"
+         class="btn btn--primary">Nueva actividad</a>
 
-<p *ngIf="loading()">Cargando...</p>
+      <a [routerLink]="['/processes', processId]"
+         class="btn btn--secondary">Volver al proceso</a>
+    </nav>
+  </header>
 
-<table *ngIf="!loading() && rows().length > 0">
-  <thead>
-    <tr>
-      <th>Nombre</th> 
-      <th>Tipo</th>
-      <th>Descripción</th>
-      <th>Rol responsable</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let a of rows()">
-      <td>{{ a.name }}</td> 
-      <td>{{ a.type }}</td>
-      <td>{{ (a as any).description || '-' }}</td>
-      <td>{{ (a as any).responsibleRole || '-' }}</td> 
-      <td>
-        <!-- Botón Editar usa la clase .btn-action -->
-        <a [routerLink]="['/processes', processId, 'activities', a.id, 'edit']" class="btn-action">Editar</a>
-        <!-- Botón Eliminar usa las clases .btn-action y .btn-delete -->
-        <button (click)="delete(a)" class="btn-action btn-delete">Eliminar</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <section class="state state--loading" *ngIf="loading()" [attr.aria-busy]="loading()">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando actividades…</p>
+  </section>
 
-<p *ngIf="!loading() && rows().length === 0">No hay actividades registradas en este proceso.</p>
+  <!-- Board de tarjetas con posicionamiento absoluto -->
+  <section class="board" *ngIf="!loading() && rows().length > 0">
+    <div
+      class="card"
+      *ngFor="let a of rows(); let i = index"
+      cdkDrag
+      [cdkDragFreeDragPosition]="{x: pos(a).x, y: pos(a).y}"
+      (cdkDragEnded)="onDragEnded(a, $event)"
+      [class.is-saving]="savingIds().has(($any(a)?.id) || -1)"
+      role="group"
+      aria-label="Actividad {{a.name}}"
+    >
+      <header class="card__header">
+        <h4 class="card__title">{{ a.name || 'Sin nombre' }}</h4>
+        <span class="card__type">{{ a.type || '—' }}</span>
+      </header>
+
+      <p class="card__desc">{{ $any(a)?.description || '—' }}</p>
+
+      <dl class="card__meta">
+        <div><dt>Rol</dt><dd>{{ a.roleId ?? '—' }}</dd></div>
+        <div><dt>Estado</dt><dd>{{ a.status ?? '—' }}</dd></div>
+        <div><dt>X</dt><dd>{{ pos(a).x | number:'1.0-0' }}</dd></div>
+        <div><dt>Y</dt><dd>{{ pos(a).y | number:'1.0-0' }}</dd></div>
+      </dl>
+
+      <footer class="card__actions">
+        <a
+          [routerLink]="['/processes', processId, 'activities', ($any(a)?.id ?? i), 'edit']"
+          class="btn btn--info btn--sm">Editar</a>
+
+        <button
+          type="button"
+          (click)="delete(a)"
+          [disabled]="$any(a)?.id == null"
+          class="btn btn--danger btn--sm">
+          Eliminar
+        </button>
+      </footer>
+    </div>
+  </section>
+
+  <section class="state state--empty" *ngIf="!loading() && rows().length === 0">
+    <img class="state__illustration" src="/assets/empty-tasks.svg" alt="" aria-hidden="true" />
+    <div>
+      <h4>No hay actividades registradas</h4>
+      <p>Agrega la primera para comenzar a documentar el proceso.</p>
+      <a [routerLink]="['/processes', processId, 'activities', 'new']"
+         class="btn btn--primary">Nueva actividad</a>
+    </div>
+  </section>
+</main>

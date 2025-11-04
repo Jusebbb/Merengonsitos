@@ -1,133 +1,285 @@
-/* Estilos para Activities List Component */
-
+/* ===========================
+   Variables y theming
+   =========================== */
 :host {
-    display: block;
-    padding: 2rem;
-    background-color: #f7f9fc;
-    min-height: 100vh;
+  --bg: #f7f7fa;
+  --panel: #ffffff;
+  --ink: #0f172a;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --ring: #2563eb;
+  --shadow: 0 10px 30px rgba(0,0,0,.08);
+  --shadow-strong: 0 16px 40px rgba(0,0,0,.14);
+  --grid-size: 20px;
+  --card-w: 320px;
 }
 
-h3 {
-    font-size: 1.8rem;
-    color: #333;
-    margin-bottom: 1.5rem;
-    border-bottom: 3px solid #007bff;
-    padding-bottom: 0.5rem;
+@media (prefers-color-scheme: dark) {
+  :host {
+    --bg: #0b0e14;
+    --panel: #0f131a;
+    --ink: #e5e7eb;
+    --muted: #9aa3b2;
+    --border: #1f2733;
+    --ring: #60a5fa;
+    --shadow: 0 10px 30px rgba(0,0,0,.45);
+    --shadow-strong: 0 18px 50px rgba(0,0,0,.6);
+  }
+}
+
+/* ===========================
+   Página y cabecera
+   =========================== */
+.page {
+  min-height: min(100dvh, 100vh);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(8px, 2vw, 20px);
+  padding: clamp(14px, 2.4vw, 22px) clamp(14px, 3vw, 28px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--bg) 92%, transparent), transparent);
+  backdrop-filter: saturate(1.2) blur(4px);
+  border-bottom: 1px solid var(--border);
+}
+
+.page__title {
+  margin: 0;
+  color: var(--ink);
+  letter-spacing: .2px;
+  font-size: clamp(18px, 2.2vw, 22px);
+  font-weight: 800;
 }
 
 .actions {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-/* Estilo general de los botones de acción fuera de la tabla */
-.btn-new, .btn-back {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-size: 1rem;
-    text-decoration: none;
-    text-align: center;
-    transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+/* ===========================
+   Estados (loading / empty)
+   =========================== */
+.state {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+.state--loading .spinner {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 3px solid color-mix(in oklab, var(--muted) 25%, transparent);
+  border-top-color: var(--ring);
+  animation: spin 900ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===========================
+   Board (lienzo)
+   =========================== */
+.board {
+  position: relative;
+  flex: 1;
+  margin: 14px clamp(10px, 2vw, 24px) clamp(10px, 2vw, 24px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background:
+    /* grid dots */
+    radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--muted) 18%, transparent) 1px, transparent 1px)
+      0 0 / var(--grid-size) var(--grid-size),
+    /* surface */
+    var(--panel);
+  box-shadow: var(--shadow);
+  overflow: auto;
+}
+
+/* scroll discreto en el lienzo */
+.board::-webkit-scrollbar { height: 10px; width: 10px; }
+.board::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--muted) 35%, transparent);
+  border-radius: 999px;
+}
+.board::-webkit-scrollbar-track { background: transparent; }
+
+/* ===========================
+   Card (tarjeta draggable)
+   =========================== */
+.card {
+  position: absolute;
+  inline-size: clamp(260px, 30vw, var(--card-w));
+  max-inline-size: 92vw;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 14px 14px 12px;
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow .2s ease, transform .15s ease, border-color .2s ease;
+  will-change: transform;
+  outline: none;
+}
+
+.card:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 30%, transparent), var(--shadow);
+}
+
+.card.cdk-drag-dragging {
+  cursor: grabbing;
+  transform: scale(1.02);
+  box-shadow: var(--shadow-strong);
+}
+
+/* handler de drag (agarre) */
+.card__header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 8px 10px;
+  margin-bottom: 8px;
+  /* toda la cabecera como handler */
+  cursor: grab;
+}
+.card.cdk-drag-dragging .card__header { cursor: grabbing; }
+
+.card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+.card__type {
+  justify-self: end;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1;
+  color: color-mix(in oklab, var(--ring) 15%, var(--ink));
+  background: color-mix(in oklab, var(--ring) 16%, transparent);
+  border: 1px solid color-mix(in oklab, var(--ring) 28%, var(--border));
+}
+
+.card__desc {
+  margin: 4px 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* metadatos en dos columnas */
+.card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin: 6px 0 8px;
+
+  dt {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .2px;
+  }
+  dd {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ink);
     font-weight: 600;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
 }
 
-/* Botón Nueva Actividad (Azul primario) */
-.btn-new {
-    background-color: #007bff;
-    color: #fff;
+/* acciones */
+.card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
 }
 
-.btn-new:hover {
-    background-color: #0056b3;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+/* estado "Guardando..." */
+.card.is-saving {
+  border-style: dashed;
+}
+.card.is-saving::after {
+  content: 'Guardando…';
+  position: absolute;
+  top: 10px; right: 12px;
+  font-size: 11px;
+  color: var(--muted);
 }
 
-/* Botón Volver (Gris secundario) */
-.btn-back {
-    background-color: #6c757d;
-    color: #fff;
+/* ===========================
+   Integraciones CDK Drag
+   =========================== */
+/* sombra y opacidad del preview que sigue al cursor */
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 14px;
+  box-shadow: var(--shadow-strong);
+  border: 1px solid var(--border);
+}
+/* placeholder invisible para no ocupar espacio visual */
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+/* animación suave al colocar */
+.cdk-drag-animating {
+  transition: transform 150ms ease;
 }
 
-.btn-back:hover {
-    background-color: #5a6268;
-    transform: translateY(-1px);
+/* ===========================
+   Botones base (por si no tienes un kit)
+   =========================== */
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--ink);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .06s ease;
+  cursor: pointer;
+}
+.btn:hover { border-color: color-mix(in oklab, var(--ring) 28%, var(--border)); }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 30%, transparent);
 }
 
-table {
-    width: 100%;
-    border-collapse: separate; 
-    border-spacing: 0;
-    background-color: #ffffff;
-    border-radius: 12px;
-    overflow: hidden; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+/* variantes */
+.btn--primary {
+  background: color-mix(in oklab, var(--ring) 22%, var(--panel));
+  border-color: color-mix(in oklab, var(--ring) 45%, var(--border));
+}
+.btn--secondary { /* mantiene esquema neutro */ }
+.btn--info { color: #2563eb; border-color: color-mix(in oklab, #2563eb 40%, var(--border)); }
+.btn--danger { color: #dc2626; border-color: color-mix(in oklab, #dc2626 40%, var(--border)); }
+.btn--sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+
+/* ===========================
+   Accesibilidad y motion
+   =========================== */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
 }
 
-thead th {
-    background-color: #e9ecef; 
-    color: #333;
-    padding: 1rem;
-    text-align: left;
-    font-weight: 700;
-}
-
-tbody tr:nth-child(even) {
-    background-color: #f7f7f7; 
-}
-
-tbody tr:hover {
-    background-color: #e3f2fd; 
-}
-
-td {
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-    color: #444;
-}
-
-tbody tr:last-child td {
-    border-bottom: none;
-}
-
-p {
-    font-size: 1.1rem;
-    color: #777;
-    padding: 1rem;
-}
-
-/* Estilos para los botones dentro de la tabla */
-.btn-action {
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    margin-right: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    text-decoration: none;
-    display: inline-block;
-}
-
-/* Botón Editar (Azul claro/Cyan) */
-.btn-action {
-    background-color: #17a2b8;
-    color: white;
-    border: none;
-}
-.btn-action:hover {
-    background-color: #138496;
-    transform: translateY(-1px);
-}
-
-/* Botón Eliminar (Rojo peligro) */
-.btn-delete {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-}
-.btn-delete:hover {
-    background-color: #c82333;
-    transform: translateY(-1px);
+/* ===========================
+   Responsive
+   =========================== */
+@media (max-width: 640px) {
+  :host { --card-w: 92vw; }
+  .page__header { padding-inline: 14px; }
 }
