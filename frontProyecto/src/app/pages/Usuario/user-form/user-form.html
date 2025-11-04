@@ -1,30 +1,91 @@
-<div class="user-form-container">
-  <h2>Crear Usuario</h2>
+<div class="login-container user-create">
+  <!-- IZQUIERDA -->
+  <div class="login-left">
+    <div class="left-content">
+      <img src="/assets/loginImagenn.png" alt="Imagen decorativa" class="left-illustration" />
+      <h1 class="welcome">Gestión de Usuarios<br />del Sistema</h1>
+    </div>
+  </div>
 
-  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-    <label for="nombre">Nombre</label>
-    <input id="nombre" formControlName="nombre" placeholder="Nombre completo"/>
+  <!-- DERECHA -->
+  <div class="login-right">
+    <div class="login-box">
+      <img src="/assets/logo.png" alt="Logo" class="logo" />
+      <h2>Crear usuario</h2>
 
-    <label for="email">Correo electrónico</label>
-    <input id="email" type="email" formControlName="email" placeholder="correo@dominio.com"/>
+      <!-- FORMULARIO -->
+      <form (ngSubmit)="onSubmit()" #userNgForm="ngForm" class="form" novalidate>
+        <!-- Nombre -->
+        <label for="nombre">Nombre</label>
+        <input
+          id="nombre"
+          name="nombre"
+          type="text"
+          [(ngModel)]="userDto.nombre"
+          placeholder="Nombre completo"
+          autocomplete="name"
+          #nombreCtrl="ngModel"
+          required
+          [class.is-invalid]="nombreCtrl.invalid && (nombreCtrl.dirty || nombreCtrl.touched)"
+        />
+        <small *ngIf="nombreCtrl.errors?.['required'] && (nombreCtrl.dirty || nombreCtrl.touched)">
+          El nombre es obligatorio.
+        </small>
 
-    <label for="password">Contraseña</label>
-    <input id="password" type="password" formControlName="password" placeholder="••••••••"/>
+        <!-- Correo -->
+        <label for="email">Correo electrónico</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          [(ngModel)]="userDto.email"
+          placeholder="correo@dominio.com"
+          autocomplete="email"
+          inputmode="email"
+          #emailCtrl="ngModel"
+          required
+          email
+          [class.is-invalid]="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)"
+        />
+        <small *ngIf="emailCtrl.errors?.['required'] && (emailCtrl.dirty || emailCtrl.touched)">
+          El correo es obligatorio.
+        </small>
+        <small *ngIf="emailCtrl.errors?.['email'] && (emailCtrl.dirty || emailCtrl.touched)">
+          Ingresa un correo válido.
+        </small>
 
-    <label for="rol">Rol</label>
-    <select id="rol" formControlName="rol">
-      <option value="ADMIN">Administrador</option>
-      <option value="EDITOR">Editor</option>
-      <option value="LECTOR">Lector</option>
-    </select>
+        <!-- Contraseña -->
+        <label for="password">Contraseña</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          [(ngModel)]="userDto.password"
+          placeholder="••••••••"
+          autocomplete="new-password"
+          #passCtrl="ngModel"
+          required
+          minlength="8"
+          [class.is-invalid]="passCtrl.invalid && (passCtrl.dirty || passCtrl.touched)"
+        />
+        <small *ngIf="passCtrl.errors?.['required'] && (passCtrl.dirty || passCtrl.touched)">
+          La contraseña es obligatoria.
+        </small>
+        <small *ngIf="passCtrl.errors?.['minlength'] && (passCtrl.dirty || passCtrl.touched)">
+          Debe tener al menos 8 caracteres.
+        </small>
 
-    <button type="submit" [disabled]="userForm.invalid || loading">
-      {{ loading ? 'Creando…' : 'Crear Usuario' }}
-    </button>
-  </form>
+        <!-- Botón -->
+        <button class="btn-primary" type="submit" [disabled]="userNgForm.invalid">
+          <span class="btn__spinner" aria-hidden="true"></span>
+          <span>Crear Usuario</span>
+        </button>
+      </form>
 
-  <div *ngIf="okMsg" class="ok">{{ okMsg }}</div>
-  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
-
-  <button *ngIf="okMsg" routerLink="/inicio-admin">Volver al inicio</button>
+      <p class="register">
+        ¿Volver al panel?
+        <a routerLink="/inicio-admin">Ir al inicio</a>
+      </p>
+    </div>
+  </div>
 </div>

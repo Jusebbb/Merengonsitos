@@ -1,71 +1,45 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule, FormGroup, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { EmpresaDTO } from '../../dtos/empresa.dto';
+import { EmpresaServices } from '../../services/Empresa/empresa.services';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, HttpClientModule, FormsModule],
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
 })
-export class RegisterComponent {
-  form!: FormGroup;
-  loading = false;
-  private API = '/api';
+export class RegisterComponent implements OnInit {
 
-  constructor(
-    private fb: FormBuilder,
-    private http: HttpClient,
+  empresaDto: EmpresaDTO = new EmpresaDTO();
+
+
+  constructor(private EmpresaServices : EmpresaServices,
     private router: Router
-  ) {
-    // Definición del formulario para crear la empresa
-    this.form = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      nit: ['', [Validators.required]],
-      correoContacto: ['', [Validators.required, Validators.email]],
-      empresaPassword: ['', [Validators.required]],
-    });
+  ){}
+
+  ngOnInit(): void {
+    
   }
+  
+ onSubmit() {
+  console.log('DTO que se enviará:', this.empresaDto);
+  this.crearEmpresa();
+}
 
-  get c() { return this.form.controls; }
-
-  onSubmit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
+crearEmpresa() {
+  this.EmpresaServices.crearEmpresa(this.empresaDto).subscribe({
+    next: (res) => {
+      console.log('Respuesta backend:', res);
+    },
+    error: (err) => {
+      console.error('[Register] ERROR al crear empresa:', err);
+      alert('No se pudo crear la empresa. Revisa consola.');
     }
-
-    this.loading = true;
-
-    const payloadEmpresa = {
-      nombre: String(this.c['nombre'].value || '').trim(),
-      nit: String(this.c['nit'].value || '').trim(),
-      correoContacto: String(this.c['correoContacto'].value || '').trim(),
-      password: String(this.c['empresaPassword'].value || '').trim(),
-    };
-
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-    this.http.post(`${this.API}/empresas`, payloadEmpresa, {
-      headers,
-      observe: 'response',
-      responseType: 'json'
-    }).subscribe({
-      next: (res) => {
-        this.loading = false;
-        this.router.navigateByUrl('/inicio-admin');
-      },
-      error: (e) => {
-        this.loading = false;
-        const msg =
-          e?.error?.message || e?.error?.error ||
-          (typeof e?.error === 'string' && e.error) ||
-          'No se pudo crear la empresa';
-        alert(msg);
-      }
-    });
-  }
+  });
+}
 }

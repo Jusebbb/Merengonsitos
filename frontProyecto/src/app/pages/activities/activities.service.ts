@@ -9,69 +9,42 @@ export type UpdatePositionPayload = { x: number; y: number };
 export class ActivitiesService {
   private http = inject(HttpClient);
 
-  private activitiesBase = '/api/activities';   // <- ActivityController
-  private processesBase  = '/api/processes';    // <- ProcessController (si lo necesitas en otros servicios)
+  /** 👇 Usa la URL completa del backend */
+  private apiBase = 'http://localhost:8080/api/activities';
 
-  // HU-08: listar actividades de un proceso
+  /** Listar todas las actividades (GET /api/activities) */
+  listAll(): Observable<activityDto[]> {
+    return this.http.get<activityDto[]>(`${this.apiBase}`);
+  }
+
+  /** Listar por proceso (GET /api/activities/by-process/{processId}) */
   listByProcess(processId: string): Observable<activityDto[]> {
-    // GET /api/activities/by-process/{processId}
-    return this.http.get<activityDto[]>(
-      `${this.activitiesBase}/by-process/${processId}`
-    );
+    return this.http.get<activityDto[]>(`${this.apiBase}/by-process/${processId}`);
   }
 
-  // HU-09: crear nueva actividad
+  /** Crear nueva (POST /api/activities) */
   create(_processId: string, body: Partial<activityDto>): Observable<activityDto> {
-    // POST /api/activities  (el processId viaja en el body, tu DTO lo exige)
-    return this.http.post<activityDto>(`${this.activitiesBase}`, body);
+    return this.http.post<activityDto>(`${this.apiBase}`, body);
   }
 
-  // HU-09: actualizar una actividad
+  /** Actualizar (PUT /api/activities/{id}) */
   update(_processId: string, id: string, body: Partial<activityDto>): Observable<activityDto> {
-    // PUT /api/activities/{id}
-    return this.http.put<activityDto>(`${this.activitiesBase}/${id}`, body);
+    return this.http.put<activityDto>(`${this.apiBase}/${id}`, body);
   }
 
-  // HU-10: eliminar una actividad (soft delete en tu controller)
+  /** Eliminar lógico (DELETE /api/activities/{id}) */
   delete(_processId: string, id: string): Observable<void> {
-    // DELETE /api/activities/{id}
-    return this.http.delete<void>(`${this.activitiesBase}/${id}`);
+    return this.http.delete<void>(`${this.apiBase}/${id}`);
   }
 
-  // obtener una actividad por id (si luego agregas GET /api/activities/{id})
+  /** Obtener por id (GET /api/activities/{id}) */
   getById(_processId: string, id: string): Observable<activityDto> {
-    return this.http.get<activityDto>(`${this.activitiesBase}/${id}`);
+    return this.http.get<activityDto>(`${this.apiBase}/${id}`);
   }
 
-  /** Guarda solo la posición (x,y) de la actividad */
-  updatePosition(
-    _processId: string | number,
-    id: string | number,
-    pos: UpdatePositionPayload
-  ): Observable<activityDto> {
-    // PATCH /api/activities/{id}/position  Body: { x, y }
-    return this.http.patch<activityDto>(
-      `${this.activitiesBase}/${id}/position`,
-      pos
-    );
-  }
-
-  // --- Alternativas por si tu backend cambia en el futuro ---
-
-  /** Si alguna vez expusieras PATCH general en /api/activities/{id} */
-  updatePositionAlt(id: string | number, pos: UpdatePositionPayload) {
-    return this.http.patch<activityDto>(`${this.activitiesBase}/${id}`, pos);
-  }
-
-  /** Si más adelante cuelgas activities bajo processes */
-  updatePositionUnderProcess(
-    processId: string | number,
-    id: string | number,
-    pos: UpdatePositionPayload
-  ) {
-    return this.http.patch<activityDto>(
-      `${this.processesBase}/${processId}/activities/${id}/position`,
-      pos
-    );
+  /** Guardar posición (PATCH /api/activities/{id}/position) */
+  updatePosition(_processId: string | number, id: string | number, pos: UpdatePositionPayload): Observable<activityDto> {
+    return this.http.patch<activityDto>(`${this.apiBase}/${id}/position`, pos);
   }
 }
+

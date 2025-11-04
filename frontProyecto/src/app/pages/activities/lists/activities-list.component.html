@@ -3,11 +3,15 @@
     <h3 class="page__title">Actividades del proceso</h3>
 
     <nav class="actions" aria-label="Acciones">
-      <a [routerLink]="['/processes', processId, 'activities', 'new']"
-         class="btn btn--primary">Nueva actividad</a>
+      <!-- Nueva actividad: usa la función del componente -->
+      <button
+        type="button"
+        class="btn btn--primary"
+        (click)="navegarNuevaActividad()"
+        aria-label="Crear nueva actividad">
+        Nueva actividad
+      </button>
 
-      <a [routerLink]="['/processes', processId]"
-         class="btn btn--secondary">Volver al proceso</a>
     </nav>
   </header>
 
@@ -63,8 +67,15 @@
     <div>
       <h4>No hay actividades registradas</h4>
       <p>Agrega la primera para comenzar a documentar el proceso.</p>
-      <a [routerLink]="['/processes', processId, 'activities', 'new']"
-         class="btn btn--primary">Nueva actividad</a>
+
+      <!-- Nueva actividad (estado vacío): también usa la función -->
+      <button
+        type="button"
+        class="btn btn--primary"
+        (click)="navegarNuevaActividad()"
+        aria-label="Crear nueva actividad">
+        Nueva actividad
+      </button>
     </div>
   </section>
 </main>

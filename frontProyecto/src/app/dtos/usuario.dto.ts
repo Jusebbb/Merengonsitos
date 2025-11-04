@@ -1,9 +1,10 @@
-export interface UsuarioDTO {
-  id?: number;
-  nombre: string;
-  email: string;
-  password: string;
-  empresaId: number;
+export class UsuarioDTO {
+  constructor(
+  public id?: number,
+  public nombre?: string,
+  public email?: string,
+  public password?: string,
+  public empresaId?: number,
+  public rol?: string
+  ){}
 }
-
-export type CrearUsuarioRequest = Omit<UsuarioDTO, 'id'>;

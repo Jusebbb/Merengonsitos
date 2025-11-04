@@ -1,7 +1,9 @@
-export interface EmpresaDTO {
-  id?: number;
-  nombre: string;
-  nit: string;
-  correoContacto: string;
-  password?: string;
+export class EmpresaDTO {
+  constructor(
+  public id?: number,
+  public nombre?: string,
+  public nit?: string,
+  public correoContacto?: string,
+  public password?: string
+  ){}
 }

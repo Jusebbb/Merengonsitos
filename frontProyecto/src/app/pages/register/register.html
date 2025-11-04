@@ -2,10 +2,7 @@
   <div class="login-left">
     <div class="left-content">
       <img src="/assets/loginImagenn.png" alt="Imagen decorativa" class="left-illustration" />
-      <h1 class="welcome">
-        Bienvenido al Sistema de <br />
-        Gestión de Procesos
-      </h1>
+      <h1 class="welcome">Bienvenido al Sistema de <br />Gestión de Procesos</h1>
     </div>
   </div>
 
@@ -14,27 +11,48 @@
       <img src="/assets/logo.png" alt="Logo" class="logo" />
       <h2>Crear cuenta de empresa</h2>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
-        <!-- Campos para la Empresa -->
+      <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="form" novalidate>
         <label for="empresaNombre">Nombre de la empresa</label>
-        <input id="empresaNombre" type="text" formControlName="nombre" placeholder="Mi Empresa S.A.S" />
-        <small *ngIf="c['nombre'].touched && c['nombre'].invalid">Requerido (mín. 2 caracteres)</small>
+        <input
+          id="empresaNombre"
+          type="text"
+          name="nombre"                      
+          [(ngModel)]="empresaDto.nombre"    
+          placeholder="Mi Empresa S.A.S"
+          required
+        />
 
         <label for="nit">NIT</label>
-        <input id="nit" type="text" formControlName="nit" placeholder="900123456-5" />
-        <small *ngIf="c['nit'].touched && c['nit'].invalid">Requerido</small>
+        <input
+          id="nit"
+          type="text"
+          name="nit"                          
+          [(ngModel)]="empresaDto.nit"        
+          placeholder="900123456-5"
+          required
+        />
 
         <label for="correoContacto">Correo de contacto</label>
-        <input id="correoContacto" type="email" formControlName="correoContacto" placeholder="contacto@empresa.com" />
-        <small *ngIf="c['correoContacto'].touched && c['correoContacto'].invalid">Correo inválido</small>
+        <input
+          id="correoContacto"
+          type="email"
+          name="correoContacto"               
+          [(ngModel)]="empresaDto.correoContacto" 
+          placeholder="contacto@empresa.com"
+          required
+        />
 
         <label for="empresaPassword">Contraseña</label>
-        <input id="empresaPassword" type="password" formControlName="empresaPassword" placeholder="••••••••" />
-        <small *ngIf="c['empresaPassword'].touched && c['empresaPassword'].invalid">Requerido</small>
+        <input
+          id="empresaPassword"
+          type="password"
+          name="password"                     
+          [(ngModel)]="empresaDto.password"    
+          placeholder="••••••••"
+          required
+        />
 
-        <button class="btn-primary" type="submit" [disabled]="loading">
-          {{ loading ? 'Creando...' : 'Registrarme' }}
-        </button>
+        <button class="btn-primary" type="submit">Registrarme</button>
       </form>
 
       <p class="register">

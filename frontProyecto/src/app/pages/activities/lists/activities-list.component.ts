@@ -1,6 +1,7 @@
-import { Component, inject, signal, OnInit, computed } from '@angular/core';
+// activities-list.component.ts
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { DragDropModule, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { ActivitiesService } from '../activities.service';
 import { activityDto } from '../../../dtos/activityDto';
@@ -17,59 +18,47 @@ type Row = activityDto & { id?: number | string };
 export class ActivitiesListComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private api = inject(ActivitiesService);
+  constructor(private router: Router) {}
 
-  processId = '';
+  processId = ''; // se mantiene por compatibilidad con tu HTML
   loading = signal(false);
   rows = signal<Row[]>([]);
-  savingIds = signal<Set<number | string>>(new Set()); // para marcar tarjetas guardando
+  savingIds = signal<Set<number | string>>(new Set());
 
-  // fallback si vienen null/undefined
   pos = (a: Row) => ({
     x: Number.isFinite(a.x as number) ? (a.x as number) : 0,
     y: Number.isFinite(a.y as number) ? (a.y as number) : 0
   });
 
   ngOnInit() {
-    this.processId = this.route.parent!.snapshot.paramMap.get('id')!;
+    // si tu ruta lleva /processes/:id/activities lo seguimos leyendo,
+    // pero NO lo usamos para filtrar: traemos TODO.
+    this.processId = this.route.parent?.snapshot.paramMap.get('id') ?? '';
     this.fetch();
   }
 
   fetch() {
-    this.loading.set(true);
-    this.api.listByProcess(this.processId).subscribe({
-      next: (data: activityDto[]) => this.rows.set(data as Row[]),
-      complete: () => this.loading.set(false)
-    });
-  }
+  this.loading.set(true);
+  this.api.listAll().subscribe({
+    next: (data) => this.rows.set(data as any),
+    error: (e) => console.error('Error listando actividades', e),
+    complete: () => this.loading.set(false)
+  });
+}
+
 
   onDragEnded(a: Row, ev: CdkDragEnd) {
     const id = (a as any)?.id;
-    if (id == null) {
-      // sin id no persistimos
-      return;
-    }
-    const { x, y } = ev.source.getFreeDragPosition(); // posición absoluta actual
-    // Optimista: actualiza la signal para que la tarjeta “salte” al lugar guardado
-    this.rows.update(list =>
-      list.map(it => (it.id === id ? { ...it, x, y } : it))
-    );
+    if (id == null) return;
+    const { x, y } = ev.source.getFreeDragPosition();
 
-    // Marcar guardando
+    this.rows.update(list => list.map(it => (it.id === id ? { ...it, x, y } : it)));
     this.savingIds.update(s => new Set([...s, id]));
 
-    // Llama a tu endpoint de update/patch de posición (ajusta el método según tu service)
     this.api.updatePosition(this.processId, id, { x, y }).subscribe({
-      next: () => {
-        // ok
-      },
-      error: () => {
-        // rollback simple: si quieres, podrías hacer refetch(); aquí lo dejamos simple
-      },
+      error: (e) => console.error('Error guardando posición', e),
       complete: () => {
-        this.savingIds.update(s => {
-          s.delete(id);
-          return new Set(s);
-        });
+        this.savingIds.update(s => { s.delete(id); return new Set(s); });
       }
     });
   }
@@ -81,6 +70,13 @@ export class ActivitiesListComponent implements OnInit {
       return;
     }
     if (!confirm(`¿Eliminar actividad "${a.name}"?`)) return;
-    this.api.delete(this.processId, id).subscribe(() => this.fetch());
+    this.api.delete(this.processId, id).subscribe({
+      next: () => this.fetch(),
+      error: (e) => console.error('Error eliminando', e)
+    });
+  }
+
+  navegarNuevaActividad() {
+    this.router.navigate(['actividad-form']);
   }
 }
