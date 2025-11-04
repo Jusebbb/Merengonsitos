@@ -1,29 +1,61 @@
-<h3>{{ isEdit? 'Editar actividad': 'Nueva actividad' }}</h3>
-<form [formGroup]="form" (ngSubmit)="save()">
+<div class="form-wrapper">
+  <div class="form-container card">
+    <header class="form-header">
+      <h1>{{ isEdit ? 'Editar actividad' : 'Nueva actividad' }}</h1>
+      <p class="muted">
+        {{ isEdit
+          ? 'Modifica los datos de la actividad existente.'
+          : 'Crea una nueva actividad dentro del proceso.' }}
+      </p>
+    </header>
 
-    <label for="name-input">Nombre</label>
-    <input id="name-input" formControlName="name" />
+    <form [formGroup]="form" (ngSubmit)="save()" class="form">
+      <div class="field">
+        <label for="name-input">Nombre</label>
+        <input id="name-input" formControlName="name" placeholder="Ej: Revisión de requisitos" />
+        <small *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
+          Campo requerido.
+        </small>
+      </div>
 
-    <label for="type-select">Tipo</label>
-    <select id="type-select" formControlName="type">
-        <option value="TASK">Tarea</option>
-        <option value="EVENT">Evento</option>
-        <option value="SUBPROCESS">Subproceso</option>
-    </select>
+      <div class="field">
+        <label for="type-select">Tipo</label>
+        <select id="type-select" formControlName="type">
+          <option value="TASK">Tarea</option>
+          <option value="EVENT">Evento</option>
+          <option value="SUBPROCESS">Subproceso</option>
+        </select>
+      </div>
 
-    <label for="desc-textarea">Descripción</label>
-    <textarea id="desc-textarea" formControlName="description"></textarea>
+      <div class="field">
+        <label for="desc-textarea">Descripción</label>
+        <textarea
+          id="desc-textarea"
+          formControlName="description"
+          placeholder="Describe brevemente la actividad..."
+        ></textarea>
+      </div>
 
-    <label for="role-input">Rol responsable</label>
-    <input 
-        id="role-input" 
-        formControlName="responsibleRole" placeholder="Ej: ADMIN / USER"
-    />
-    
-    <div class="buttons">
-        <!-- Botón Guardar con validación automática -->
-        <button type="submit" [disabled]="form.invalid">Guardar</button>
-        <!-- Botón Cancelar -->
-        <a [routerLink]="['/processes', processId, 'activities']">Cancelar</a>
-    </div>
-</form>
+      <div class="field">
+        <label for="role-input">Rol responsable</label>
+        <input
+          id="role-input"
+          formControlName="responsibleRole"
+          placeholder="Ej: ADMIN / USER / ANALISTA"
+        />
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
+          {{ isEdit ? 'Guardar cambios' : 'Crear actividad' }}
+        </button>
+        <a
+          class="btn btn-ghost"
+          [routerLink]="['/processes', processId, 'activities']"
+        >
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

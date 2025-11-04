@@ -1,19 +1,41 @@
-<h2>{{ isEdit ? 'Editar proceso' : 'Nuevo proceso' }}</h2>
+<div class="form-wrapper">
+  <div class="form-container card">
+    <header class="form-header">
+      <h1>{{ isEdit ? 'Editar proceso' : 'Nuevo proceso' }}</h1>
+      <p class="muted">
+        {{ isEdit ? 'Modifica los datos del proceso existente.' : 'Registra un nuevo proceso dentro de la empresa.' }}
+      </p>
+    </header>
 
-<form [formGroup]="form" (ngSubmit)="save()">
-  <label>Nombre</label>
-  <input formControlName="name" />
+    <form [formGroup]="form" (ngSubmit)="save()" class="form">
+      <div class="field">
+        <label for="name">Nombre del proceso</label>
+        <input id="name" formControlName="name" placeholder="Ej: Revisión de contratos" />
+        <small *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
+          Campo requerido.
+        </small>
+      </div>
 
-  <label>Descripción</label>
-  <textarea formControlName="description"></textarea>
+      <div class="field">
+        <label for="description">Descripción</label>
+        <textarea id="description" formControlName="description" placeholder="Describe brevemente el objetivo del proceso..."></textarea>
+      </div>
 
-  <label>Estado</label>
-  <select formControlName="status">
-    <option value="DRAFT">Borrador</option>
-    <option value="ACTIVE">Activo</option>
-    <option value="ARCHIVED">Archivado</option>
-  </select>
+      <div class="field">
+        <label for="status">Estado</label>
+        <select id="status" formControlName="status">
+          <option value="DRAFT">Borrador</option>
+          <option value="ACTIVE">Activo</option>
+          <option value="ARCHIVED">Archivado</option>
+        </select>
+      </div>
 
-  <button type="submit" [disabled]="form.invalid">Guardar</button>
-  <a routerLink="/processes">Cancelar</a>
-</form>
+      <div class="actions">
+        <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
+          {{ isEdit ? 'Guardar cambios' : 'Crear proceso' }}
+        </button>
+        <a routerLink="/processes" class="btn btn-ghost">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>

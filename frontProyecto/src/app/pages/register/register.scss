@@ -1,153 +1,159 @@
-/* === TARJETA PRINCIPAL (UNA SOLA PIEZA CON SOMBRA) === */
+/* === CONTENEDOR PRINCIPAL A PANTALLA COMPLETA === */
 .login-container {
-  max-width: 980px;            /* tarjeta compacta */
-  margin: 48px auto;           /* márgenes grandes */
-  min-height: 70vh;
+  width: 100%;
+  height: 100vh; /* 👈 ocupa toda la altura visible */
   display: flex;
-  border-radius: 28px;
-  overflow: hidden;            /* las esquinas redondeadas aplican a ambos lados */
-  background: #fff;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08); /* << sombrita suave */
+  align-items: stretch;
+  justify-content: center;
   font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #b8e1f5 50%, #ffffff 50%);
 }
 
 /* === IZQUIERDA === */
 .login-left {
   flex: 1;
-  background-color: #b8e1f5; /* azul pedido */
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  padding: 40px;
 }
 
 .left-content {
-  display: grid;
-  place-items: center;
-  gap: 18px;
-  padding: 24px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
 }
 
 .left-illustration {
-  width: 56%;
-  max-width: 280px;
+  width: 55%;
+  max-width: 320px;
   height: auto;
   object-fit: contain;
 }
 
 .welcome {
-  margin: 0;
-  line-height: 1.2;
+  color: #0f3d63;
   font-weight: 800;
-  font-size: clamp(20px, 3.2vw, 28px);
-  color: #0f3d63; /* buen contraste sobre #b8e1f5 */
-  text-wrap: balance;
+  font-size: clamp(22px, 3.5vw, 30px);
+  line-height: 1.3;
 }
 
 /* === DERECHA === */
 .login-right {
   flex: 1;
-  display: grid;
-  place-items: center;
-  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+  padding: 40px;
 }
 
-/* Caja del formulario: compacta y sin sombra para que parezca una sola pieza */
+/* === TARJETA DE REGISTRO === */
 .login-box {
   width: 100%;
-  max-width: 320px;
-  padding: 20px;
+  max-width: 360px;
   text-align: center;
-  box-shadow: none;   /* la sombra está en el contenedor principal */
-  background: transparent;
-
-  .logo { width: 160px; }  /* logo más grande */
-  h2    { font-size: 1.6rem; color: #2a7de1; margin: 10px 0 18px; }
 }
 
-/* === FORM === */
+.logo {
+  width: 180px;
+  margin-bottom: 12px;
+}
+
+h2 {
+  font-size: 1.7rem;
+  color: #2a7de1;
+  margin-bottom: 20px;
+}
+
+/* === FORMULARIO === */
 .form {
   display: flex;
   flex-direction: column;
   text-align: left;
-
-  label { font-weight: 600; color: #333; margin-bottom: 4px; font-size: .9rem; }
-
-  input {
-    padding: 10px 12px;
-    border: 1px solid #dfe7f1;
-    border-radius: 8px;
-    font-size: .95rem;
-    margin-bottom: 12px;
-    transition: box-shadow .2s, border-color .2s;
-    &:focus { outline: none; border-color: #2a7de1; box-shadow: 0 0 0 3px rgba(42,125,225,.15); }
-  }
-
-  .options {
-    display: flex; justify-content: space-between; align-items: center;
-    margin: 6px 0 14px;
-    .remember { font-size: .9rem; color: #555; }
-    .forgot   { font-size: .9rem; color: #2a7de1; text-decoration: none; &:hover { text-decoration: underline; } }
-  }
-
-  .btn-primary {
-    background: #2a7de1; color: #fff; border: none; border-radius: 8px;
-    padding: 10px 12px; font-size: .98rem; font-weight: 600; cursor: pointer;
-    transition: background-color .2s, box-shadow .2s;
-    &:hover { background: #155db2; box-shadow: 0 4px 10px rgba(42,125,225,.25); }
-  }
 }
 
-/* Footer */
-.register {
-  margin-top: 14px; color: #555;
-  a { color: #2a7de1; text-decoration: none; font-weight: 600; margin-left: 4px; &:hover { text-decoration: underline; } }
+label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+  font-size: .9rem;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .login-container { margin: 24px auto; flex-direction: column; min-height: unset; }
-  .login-left { height: 220px; }
-  .left-illustration { width: 45%; max-width: 220px; }
-  .login-box { max-width: 300px; }
-}
-/* cada bloque del form con separación uniforme */
-.field {
-  display: grid;
-  gap: 6px;
-  margin-bottom: 14px;   /* 👈 más espacio bajo cada field */
-}
-
-/* botones segmentados con más espacio y sin “pegarse” al submit */
-.seg-group {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;             /* 👈 separa Empleado / Administrador */
-  margin-top: 2px;
-  margin-bottom: 12px;   /* 👈 separa del botón Registrarme */
-}
-
-.seg-btn {
-  padding: 12px 10px;
-  border-radius: 12px;
+input {
+  padding: 10px 12px;
   border: 1px solid #dfe7f1;
-  background: #f7fbff;
-  color: #2b75d1;
+  border-radius: 8px;
+  font-size: .95rem;
+  margin-bottom: 14px;
+  transition: box-shadow .2s, border-color .2s;
+}
+input:focus {
+  outline: none;
+  border-color: #2a7de1;
+  box-shadow: 0 0 0 3px rgba(42,125,225,.15);
+}
+
+small {
+  color: #d9534f;
+  font-size: .8rem;
+  margin-bottom: 10px;
+}
+
+/* === BOTÓN === */
+.btn-primary {
+  background: #2a7de1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 12px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color .2s, box-shadow .2s, transform .02s;
-
-  &:hover   { background: #eef6ff; }
-  &:active  { transform: translateY(1px); }
-
-  &.active {
-    background: #2a7de1;
-    color: #fff;
-    border-color: #2a7de1;
-    box-shadow: 0 8px 16px rgba(42,125,225,.25);
-  }
+  transition: background-color .2s, box-shadow .2s;
+}
+.btn-primary:hover {
+  background: #155db2;
+  box-shadow: 0 4px 10px rgba(42,125,225,.25);
 }
 
-/* por si el botón quedaba muy cerca igualmente */
-.form .btn-primary {
-  margin-top: 6px;       /* 👈 un pelín de aire extra */
+/* === FOOTER === */
+.register {
+  margin-top: 18px;
+  color: #555;
+}
+.register a {
+  color: #2a7de1;
+  text-decoration: none;
+  font-weight: 600;
+}
+.register a:hover {
+  text-decoration: underline;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  .login-container {
+    flex-direction: column;
+    background: #b8e1f5;
+  }
+
+  .login-left {
+    height: 220px;
+  }
+
+  .login-right {
+    background: #fff;
+    box-shadow: none;
+  }
+
+  .login-box {
+    max-width: 320px;
+    padding: 20px;
+  }
 }

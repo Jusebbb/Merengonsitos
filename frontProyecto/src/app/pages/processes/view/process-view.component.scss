@@ -1,4 +1,144 @@
-.tabs { display:flex; gap:1rem; margin:1rem 0; }
-.tabs a { text-decoration:none; padding:.25rem .5rem; border-radius:.25rem; }
-.tabs a.active { background:#efefef; }
-.muted { color:#666; }
+.page {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+
+  .titles {
+    .title {
+      margin: 0;
+      font-size: clamp(20px, 2.4vw, 28px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #0b2b4a;
+    }
+    .strong { color: #083b74; }
+    .muted  {
+      margin: .3rem 0 0;
+      color: #64748b;
+      font-size: .95rem;
+      max-width: 72ch;
+    }
+  }
+}
+
+/* Botones */
+.btn {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  transition: background-color .2s, box-shadow .2s, transform .02s;
+
+  &:hover { background: #f8fafc; }
+  &:active { transform: translateY(1px); }
+
+  &.btn-ghost {
+    background: #fff;
+    border-color: #e2e8f0;
+  }
+}
+
+/* Card para el contenido de la pestaña */
+.card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(2, 8, 20, .04);
+}
+
+/* Tabs */
+.tabs {
+  position: sticky;
+  top: 0;                /* se “pegan” arriba cuando hay scroll del contenido */
+  z-index: 5;
+  display: flex;
+  gap: .25rem;
+  padding: .25rem;
+  border-radius: 12px;
+  background: #eaf2fb;
+  border: 1px solid #d7e4fb;
+
+  .tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 10px;
+    color: #0b2b4a;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color .2s, color .2s;
+
+    &:hover { background: #dfeafc; }
+
+    /* Indicador inferior animado */
+    &::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 6px;
+      height: 3px;
+      border-radius: 2px;
+      background: transparent;
+      transform: scaleX(0);
+      transition: transform .2s ease, background-color .2s;
+      transform-origin: left;
+    }
+
+    &.active {
+      background: #fff;
+      color: #1a65c9;
+      box-shadow: 0 10px 20px rgba(26, 101, 201, .08);
+
+      &::after {
+        background: #2a7de1;
+        transform: scaleX(1);
+      }
+    }
+  }
+}
+
+/* Contenedor del contenido de la pestaña */
+.tab-content {
+  padding: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .page { padding: 1rem; }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tabs {
+    gap: .35rem;
+    flex-wrap: wrap;
+    .tab {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+  }
+}

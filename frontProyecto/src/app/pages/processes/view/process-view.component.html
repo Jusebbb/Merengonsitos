@@ -1,12 +1,24 @@
-<h2>Proceso: {{ process?.name }}</h2>
-<p class="muted">{{ process?.description }}</p>
+<section class="page">
+  <header class="page-header">
+    <div class="titles">
+      <h1 class="title">
+        Proceso: <span class="strong">{{ process?.name }}</span>
+      </h1>
+      <p class="muted" *ngIf="process?.description as desc">{{ desc }}</p>
+    </div>
 
-<nav class="tabs">
-  <a [routerLink]="['info']" routerLinkActive="active">Info general</a>
-  <a [routerLink]="['activities']" routerLinkActive="active">Actividades</a>
-  <a [routerLink]="['arcs']" routerLinkActive="active">Arcos</a>
-  <a [routerLink]="['gateways']" routerLinkActive="active">Gateways</a>
-  <a [routerLink]="['history']" routerLinkActive="active">Historial</a>
-</nav>
+    <a class="btn btn-ghost" routerLink="/processes" aria-label="Volver al listado">← Volver</a>
+  </header>
 
-<router-outlet></router-outlet>
+  <nav class="tabs" aria-label="Secciones del proceso">
+    <a class="tab" [routerLink]="['info']"       routerLinkActive="active">Info general</a>
+    <a class="tab" [routerLink]="['activities']" routerLinkActive="active">Actividades</a>
+    <a class="tab" [routerLink]="['arcs']"       routerLinkActive="active">Arcos</a>
+    <a class="tab" [routerLink]="['gateways']"   routerLinkActive="active">Gateways</a>
+    <a class="tab" [routerLink]="['history']"    routerLinkActive="active">Historial</a>
+  </nav>
+
+  <div class="tab-content card">
+    <router-outlet></router-outlet>
+  </div>
+</section>
